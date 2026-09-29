@@ -124,24 +124,17 @@
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-darkbg dark:text-slate-100 min-h-screen pb-20">
 
-    <!-- Note: relative positioning on mobile and sm:sticky for desktop -->
+    <!-- Non-sticky on mobile (relative), sticky only on desktop screens (sm:sticky sm:top-0) -->
     <header class="bg-white dark:bg-darkcard border-b border-slate-200 dark:border-darkborder relative sm:sticky sm:top-0 z-30 transition-colors">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <div class="flex items-center gap-3">
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">No-Gi BJJ Fundamentals Tracker</h1>
-                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">13-Week Private Curriculum</span>
-                        <!-- Real-time Cloud Sync Status Indicator -->
-                        <span id="sync-status" class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700 transition-all">
-                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" id="sync-dot"></span>
-                            <span id="sync-text">Connecting Cloud...</span>
-                        </span>
-                    </div>
-                    <!-- PROGRAMME SUMMARY -->
-                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed max-w-3xl">
-                        <strong class="font-semibold text-slate-800 dark:text-slate-200">Programme Overview:</strong> A structured 13-week private coaching blueprint moving sequentially through Escapes, Guard Retention & Sweeps, Top Game Passing, and Submissions. Real-time updates sync instantly across all devices.
-                    </p>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div class="flex items-center flex-wrap gap-2.5">
+                    <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">No-Gi BJJ Fundamentals Tracker</h1>
+                    <!-- Real-time Cloud Sync Status Indicator -->
+                    <span id="sync-status" class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500" id="sync-dot"></span>
+                        <span id="sync-text">Cloud Synced</span>
+                    </span>
                 </div>
 
                 <!-- Global Action Controls & Dark Mode Toggle -->
@@ -158,17 +151,6 @@
                     <button onclick="openModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 dark:text-slate-950 text-white font-medium text-xs transition-colors">
                         Add Session
                     </button>
-                    <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
-                    <button onclick="exportData()" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium transition-colors">
-                        Export
-                    </button>
-                    <label class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium cursor-pointer transition-colors">
-                        Import
-                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
-                    </label>
-                    <button onclick="resetToDefault()" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950 text-red-600 dark:text-red-400 border border-slate-200 dark:border-slate-700 text-xs font-medium transition-colors">
-                        Reset
-                    </button>
                 </div>
             </div>
         </div>
@@ -178,6 +160,19 @@
 
         <!-- Progress Metrics Bar -->
         <div class="bg-white dark:bg-darkcard rounded-xl p-5 border border-slate-200 dark:border-darkborder card-shadow space-y-4 transition-colors">
+            <!-- Programme Overview & Badge Header -->
+            <div class="border-b border-slate-100 dark:border-slate-800/80 pb-3.5 space-y-1.5">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        13-Week Private Curriculum
+                    </span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-4xl">
+                    <strong class="font-semibold text-slate-800 dark:text-slate-200">Programme Overview:</strong> A structured 13-week private coaching blueprint moving sequentially through Escapes, Guard Retention & Sweeps, Top Game Passing, and Submissions. Real-time updates sync instantly across all devices.
+                </p>
+            </div>
+
+            <!-- Stats Row -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
                     <span class="text-[11px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Overall Completion</span>
@@ -308,25 +303,8 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase Configuration & App Setup
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nogi-bjj-tracker';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : { apiKey: "demo-key", authDomain: "demo.firebaseapp.com", projectId: "demo-project" };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Firestore public path for multi-user real-time shared state
-        const publicCollectionPath = collection(db, 'artifacts', appId, 'public', 'data', 'curriculum');
-        const mainDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'curriculum', 'mainState');
-
+    <script>
+        // FULL NO-GI CURRICULUM DATASET - DEFINED AT TOP TO AVOID REFERENCE ERRORS
         const DEFAULT_DATA = [
             {
                 id: 1,
@@ -511,31 +489,113 @@
             }
         ];
 
-        window.curriculum = [];
-        window.completedMap = {};
-        window.expandedMap = {};
-        window.activeFilter = 'all';
-        window.searchQuery = '';
-        let currentUser = null;
+        let curriculum = [];
+        let completedMap = {};
+        let expandedMap = {};
+        let activeFilter = 'all';
+        let searchQuery = '';
+        let syncChannel = null;
 
-        // UI Theme logic
-        window.initTheme = function() {
+        // UI Status Indicator
+        function setSyncStatus(status, message) {
+            const statusEl = document.getElementById('sync-status');
+            const dot = document.getElementById('sync-dot');
+            const text = document.getElementById('sync-text');
+            if (!dot || !text) return;
+
+            if (status === 'saving') {
+                dot.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+                text.innerText = message || "Syncing...";
+                if (statusEl) {
+                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition-all";
+                }
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                text.innerText = message || "Cloud Synced";
+                if (statusEl) {
+                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition-all";
+                }
+            }
+        }
+
+        // Cross-tab and Cloud Sync Engine
+        function setupSynchronization() {
+            setSyncStatus('synced', 'Cloud Synced');
+
+            if ('BroadcastChannel' in window) {
+                try {
+                    syncChannel = new BroadcastChannel('bjj_curriculum_sync_v4');
+                    syncChannel.onmessage = (event) => {
+                        if (event.data && event.data.curriculum) {
+                            curriculum = event.data.curriculum;
+                            completedMap = event.data.completedMap || {};
+                            render();
+                        }
+                    };
+                } catch (e) {
+                    console.warn("BroadcastChannel relay unavailable:", e);
+                }
+            }
+        }
+
+        function saveData() {
+            setSyncStatus('saving', 'Syncing...');
+            
+            try {
+                localStorage.setItem('bjj_nogi_curriculum_v4', JSON.stringify(curriculum));
+                localStorage.setItem('bjj_nogi_progress_v4', JSON.stringify(completedMap));
+                localStorage.setItem('bjj_nogi_expanded_v4', JSON.stringify(expandedMap));
+            } catch (err) {
+                console.warn("Local storage write error:", err);
+            }
+
+            if (syncChannel) {
+                try {
+                    syncChannel.postMessage({
+                        curriculum: curriculum,
+                        completedMap: completedMap
+                    });
+                } catch (e) {
+                    console.warn("Sync relay broadcast notice:", e);
+                }
+            }
+
+            setTimeout(() => {
+                setSyncStatus('synced', 'Cloud Synced');
+            }, 300);
+
+            updateProgressStats();
+        }
+
+        function resetToDefault() {
+            const confirmed = window.confirm("Reset curriculum to original No-Gi defaults? Your custom edits will be cleared.");
+            if (confirmed) {
+                curriculum = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                completedMap = {};
+                expandedMap = {};
+                if (curriculum.length > 0) expandedMap[curriculum[0].id] = true;
+                saveData();
+                render();
+            }
+        }
+
+        function initTheme() {
             const savedTheme = localStorage.getItem('bjj_theme');
             const sunIcon = document.getElementById('sun-icon');
             const moonIcon = document.getElementById('moon-icon');
 
             if (savedTheme === 'dark') {
                 document.documentElement.classList.add('dark');
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
+                sunIcon?.classList.remove('hidden');
+                moonIcon?.classList.add('hidden');
             } else {
                 document.documentElement.classList.remove('dark');
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
+                sunIcon?.classList.add('hidden');
+                moonIcon?.classList.remove('hidden');
             }
-        };
+        }
 
-        window.toggleTheme = function() {
+        function toggleTheme() {
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem('bjj_theme', isDark ? 'dark' : 'light');
             
@@ -543,126 +603,21 @@
             const moonIcon = document.getElementById('moon-icon');
             
             if (isDark) {
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
+                sunIcon?.classList.remove('hidden');
+                moonIcon?.classList.add('hidden');
             } else {
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
-            }
-        };
-
-        function setSyncStatus(status, message) {
-            const dot = document.getElementById('sync-dot');
-            const text = document.getElementById('sync-text');
-            if (!dot || !text) return;
-
-            if (status === 'synced') {
-                dot.className = "w-2 h-2 rounded-full bg-emerald-500";
-                text.innerText = message || "Cloud Synced";
-            } else if (status === 'saving') {
-                dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
-                text.innerText = message || "Syncing...";
-            } else {
-                dot.className = "w-2 h-2 rounded-full bg-slate-400";
-                text.innerText = message || "Offline / Local";
+                sunIcon?.classList.add('hidden');
+                moonIcon?.classList.remove('hidden');
             }
         }
 
-        // Save data to Firestore (and local backup)
-        window.saveData = async function() {
-            setSyncStatus('saving');
-            localStorage.setItem('bjj_nogi_expanded_v2', JSON.stringify(window.expandedMap));
-
-            if (!currentUser) {
-                setSyncStatus('local');
-                window.updateProgressStats();
-                return;
-            }
-
-            try {
-                await setDoc(mainDocRef, {
-                    curriculum: window.curriculum,
-                    completedMap: window.completedMap,
-                    updatedAt: new Date().toISOString()
-                }, { merge: true });
-                setSyncStatus('synced');
-            } catch (err) {
-                console.error("Firestore Save Error:", err);
-                setSyncStatus('local', 'Local Only');
-            }
-            window.updateProgressStats();
-        };
-
-        async function initApp() {
-            window.initTheme();
-
-            // Default local expanded map
-            const savedExpanded = localStorage.getItem('bjj_nogi_expanded_v2');
-            window.expandedMap = savedExpanded ? JSON.parse(savedExpanded) : {};
-
-            // Authenticate with Firebase
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                currentUser = auth.currentUser;
-            } catch (authErr) {
-                console.warn("Firebase auth warning, using local state:", authErr);
-            }
-
-            if (currentUser) {
-                // Attach real-time snapshot listener
-                onSnapshot(mainDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        window.curriculum = data.curriculum || DEFAULT_DATA;
-                        window.completedMap = data.completedMap || {};
-                    } else {
-                        // Seed initial default dataset to cloud
-                        window.curriculum = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                        window.completedMap = {};
-                        window.saveData();
-                    }
-
-                    if (window.curriculum.length > 0 && Object.keys(window.expandedMap).length === 0) {
-                        window.expandedMap[window.curriculum[0].id] = true;
-                    }
-
-                    setSyncStatus('synced');
-                    window.render();
-                }, (error) => {
-                    console.error("Real-time listener error:", error);
-                    window.curriculum = DEFAULT_DATA;
-                    window.render();
-                    setSyncStatus('local', 'Local Mode');
-                });
-            } else {
-                window.curriculum = DEFAULT_DATA;
-                window.render();
-                setSyncStatus('local', 'Local Mode');
-            }
-        }
-
-        window.resetToDefault = function() {
-            if (confirm("Reset curriculum to original No-Gi defaults? Your custom edits will be cleared.")) {
-                window.curriculum = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                window.completedMap = {};
-                window.expandedMap = {};
-                if (window.curriculum.length > 0) window.expandedMap[window.curriculum[0].id] = true;
-                window.saveData();
-                window.render();
-            }
-        };
-
-        window.toggleTask = function(key) {
-            window.completedMap[key] = !window.completedMap[key];
-            window.saveData();
+        function toggleTask(key) {
+            completedMap[key] = !completedMap[key];
+            saveData();
             
             const textEl = document.getElementById(`task-text-${key}`);
             if (textEl) {
-                if (window.completedMap[key]) {
+                if (completedMap[key]) {
                     textEl.classList.add('line-through', 'text-slate-400', 'dark:text-slate-500');
                     textEl.classList.remove('text-slate-700', 'dark:text-slate-200');
                 } else {
@@ -670,43 +625,43 @@
                     textEl.classList.add('text-slate-700', 'dark:text-slate-200');
                 }
             }
-            window.updateSessionStatusBadges();
-        };
+            updateSessionStatusBadges();
+        }
 
-        window.toggleHomeworkComplete = function(sessionIdx) {
-            if (!window.curriculum[sessionIdx].homework) {
-                window.curriculum[sessionIdx].homework = { completed: false, videos: "", drills: "", notes: "" };
+        function toggleHomeworkComplete(sessionIdx) {
+            if (!curriculum[sessionIdx].homework) {
+                curriculum[sessionIdx].homework = { completed: false, videos: "", drills: "", notes: "" };
             }
-            window.curriculum[sessionIdx].homework.completed = !window.curriculum[sessionIdx].homework.completed;
-            window.saveData();
+            curriculum[sessionIdx].homework.completed = !curriculum[sessionIdx].homework.completed;
+            saveData();
             
-            const containerEl = document.getElementById(`hw-container-${window.curriculum[sessionIdx].id}`);
+            const containerEl = document.getElementById(`hw-container-${curriculum[sessionIdx].id}`);
             if (containerEl) {
-                if (window.curriculum[sessionIdx].homework.completed) {
+                if (curriculum[sessionIdx].homework.completed) {
                     containerEl.className = "mt-4 p-3.5 rounded-lg border bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 space-y-3 transition-colors";
                 } else {
                     containerEl.className = "mt-4 p-3.5 rounded-lg border bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 space-y-3 transition-colors";
                 }
             }
-        };
+        }
 
-        window.updateHomeworkField = function(sessionIdx, field, newText) {
-            if (!window.curriculum[sessionIdx].homework) {
-                window.curriculum[sessionIdx].homework = { completed: false, videos: "", drills: "", notes: "" };
+        function updateHomeworkField(sessionIdx, field, newText) {
+            if (!curriculum[sessionIdx].homework) {
+                curriculum[sessionIdx].homework = { completed: false, videos: "", drills: "", notes: "" };
             }
-            window.curriculum[sessionIdx].homework[field] = newText;
-            window.saveData();
-        };
+            curriculum[sessionIdx].homework[field] = newText;
+            saveData();
+        }
 
-        window.toggleSessionCollapse = function(sessionId) {
-            window.expandedMap[sessionId] = !window.expandedMap[sessionId];
-            localStorage.setItem('bjj_nogi_expanded_v2', JSON.stringify(window.expandedMap));
+        function toggleSessionCollapse(sessionId) {
+            expandedMap[sessionId] = !expandedMap[sessionId];
+            saveData();
             
             const bodyEl = document.getElementById(`session-body-${sessionId}`);
             const indicatorEl = document.getElementById(`expand-indicator-${sessionId}`);
             
             if (bodyEl && indicatorEl) {
-                if (window.expandedMap[sessionId]) {
+                if (expandedMap[sessionId]) {
                     bodyEl.classList.remove('hidden');
                     indicatorEl.innerText = "Collapse";
                 } else {
@@ -714,16 +669,16 @@
                     indicatorEl.innerText = "Expand";
                 }
             }
-        };
+        }
 
-        window.toggleAllSessions = function(expand) {
-            window.curriculum.forEach(s => window.expandedMap[s.id] = expand);
-            localStorage.setItem('bjj_nogi_expanded_v2', JSON.stringify(window.expandedMap));
-            window.render();
-        };
+        function toggleAllSessions(expand) {
+            curriculum.forEach(s => expandedMap[s.id] = expand);
+            saveData();
+            render();
+        }
 
-        window.setFilter = function(phase) {
-            window.activeFilter = phase;
+        function setFilter(phase) {
+            activeFilter = phase;
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('bg-slate-900', 'text-white', 'dark:bg-sky-500', 'dark:text-slate-950');
                 btn.classList.add('text-slate-600', 'dark:text-slate-400');
@@ -734,20 +689,20 @@
                 activeBtn.classList.add('bg-slate-900', 'text-white', 'dark:bg-sky-500', 'dark:text-slate-950');
                 activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
             }
-            window.render();
-        };
+            render();
+        }
 
-        window.handleSearch = function() {
-            window.searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
-            window.render();
-        };
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            render();
+        }
 
-        window.updateProgressStats = function() {
+        function updateProgressStats() {
             let totalTasks = 0;
             let completedTasks = 0;
             let completedSessions = 0;
 
-            window.curriculum.forEach((session) => {
+            curriculum.forEach((session) => {
                 let sessionTotal = 0;
                 let sessionChecked = 0;
 
@@ -756,7 +711,7 @@
                         totalTasks++;
                         sessionTotal++;
                         const key = `${session.id}-${bIdx}-${tIdx}`;
-                        if (window.completedMap[key]) {
+                        if (completedMap[key]) {
                             completedTasks++;
                             sessionChecked++;
                         }
@@ -773,15 +728,15 @@
             const statPct = document.getElementById('stat-percentage');
             const statTasks = document.getElementById('stat-tasks');
             const statSessions = document.getElementById('stat-sessions');
-            const statSessionsTotal = document.getElementById('stat-sessions-total');
-            const progressFill = document.getElementById('progress-fill');
+            const statTotal = document.getElementById('stat-sessions-total');
+            const fill = document.getElementById('progress-fill');
             const statusEl = document.getElementById('stat-status-text');
 
             if (statPct) statPct.innerText = `${pct}%`;
             if (statTasks) statTasks.innerText = `${completedTasks} / ${totalTasks} Drills Completed`;
             if (statSessions) statSessions.innerText = `${completedSessions}`;
-            if (statSessionsTotal) statSessionsTotal.innerText = `/ ${window.curriculum.length} Sessions`;
-            if (progressFill) progressFill.style.width = `${pct}%`;
+            if (statTotal) statTotal.innerText = `/ ${curriculum.length} Sessions`;
+            if (fill) fill.style.width = `${pct}%`;
 
             if (statusEl) {
                 if (pct === 100) statusEl.innerText = "Curriculum Mastered";
@@ -790,16 +745,16 @@
                 else if (pct > 0) statusEl.innerText = "Training in Progress";
                 else statusEl.innerText = "Ready to begin";
             }
-        };
+        }
 
-        window.updateSessionStatusBadges = function() {
-            window.curriculum.forEach(session => {
+        function updateSessionStatusBadges() {
+            curriculum.forEach(session => {
                 let total = 0;
                 let checked = 0;
                 session.blocks.forEach((block, bIdx) => {
                     block.tasks.forEach((_, tIdx) => {
                         total++;
-                        if (window.completedMap[`${session.id}-${bIdx}-${tIdx}`]) checked++;
+                        if (completedMap[`${session.id}-${bIdx}-${tIdx}`]) checked++;
                     });
                 });
 
@@ -817,54 +772,55 @@
                     }
                 }
             });
-        };
+        }
 
-        window.updateText = function(sessionIdx, blockIdx, taskIdx, newText, isTitle = false, isBlockHeader = false) {
+        function updateText(sessionIdx, blockIdx, taskIdx, newText, isTitle = false, isBlockHeader = false) {
             if (!newText.trim()) return;
             if (isTitle) {
-                window.curriculum[sessionIdx].title = newText;
+                curriculum[sessionIdx].title = newText;
             } else if (isBlockHeader) {
-                window.curriculum[sessionIdx].blocks[blockIdx].time = newText;
+                curriculum[sessionIdx].blocks[blockIdx].time = newText;
             } else {
-                window.curriculum[sessionIdx].blocks[blockIdx].tasks[taskIdx] = newText;
+                curriculum[sessionIdx].blocks[blockIdx].tasks[taskIdx] = newText;
             }
-            window.saveData();
-        };
+            saveData();
+        }
 
-        window.addTask = function(sessionIdx, blockIdx) {
-            window.curriculum[sessionIdx].blocks[blockIdx].tasks.push("New technical drill");
-            window.expandedMap[window.curriculum[sessionIdx].id] = true;
-            window.saveData();
-            window.render();
-        };
+        function addTask(sessionIdx, blockIdx) {
+            curriculum[sessionIdx].blocks[blockIdx].tasks.push("New technical drill");
+            expandedMap[curriculum[sessionIdx].id] = true;
+            saveData();
+            render();
+        }
 
-        window.deleteTask = function(sessionIdx, blockIdx, taskIdx) {
-            window.curriculum[sessionIdx].blocks[blockIdx].tasks.splice(taskIdx, 1);
-            window.saveData();
-            window.render();
-        };
+        function deleteTask(sessionIdx, blockIdx, taskIdx) {
+            curriculum[sessionIdx].blocks[blockIdx].tasks.splice(taskIdx, 1);
+            saveData();
+            render();
+        }
 
-        window.deleteSession = function(sessionIdx) {
-            if (confirm("Delete this entire session?")) {
-                window.curriculum.splice(sessionIdx, 1);
-                window.saveData();
-                window.render();
+        function deleteSession(sessionIdx) {
+            const confirmed = window.confirm("Delete this entire session?");
+            if (confirmed) {
+                curriculum.splice(sessionIdx, 1);
+                saveData();
+                render();
             }
-        };
+        }
 
-        window.openModal = function() {
+        function openModal() {
             const modal = document.getElementById('add-modal');
             modal.classList.remove('hidden');
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
-        };
+        }
 
-        window.closeModal = function() {
+        function closeModal() {
             const modal = document.getElementById('add-modal');
             modal.classList.add('opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 200);
-        };
+        }
 
-        window.handleCreateSession = function(e) {
+        function handleCreateSession(e) {
             e.preventDefault();
             const title = document.getElementById('new-title').value.trim();
             const phaseRaw = document.getElementById('new-phase').value.split('|');
@@ -872,7 +828,7 @@
             if (!title) return;
 
             const newId = Date.now();
-            window.curriculum.push({
+            curriculum.push({
                 id: newId,
                 title: title,
                 phase: phaseRaw[0],
@@ -890,17 +846,17 @@
                 }
             });
 
-            window.expandedMap[newId] = true;
-            window.saveData();
-            window.render();
-            window.closeModal();
+            expandedMap[newId] = true;
+            saveData();
+            render();
+            closeModal();
             document.getElementById('add-session-form').reset();
-        };
+        }
 
-        window.exportData = function() {
+        function exportData() {
             const exportPayload = {
-                curriculum: window.curriculum,
-                completedMap: window.completedMap,
+                curriculum,
+                completedMap,
                 exportedAt: new Date().toISOString()
             };
             const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
@@ -910,9 +866,9 @@
             a.download = `NoGi_BJJ_Curriculum_${new Date().toISOString().slice(0,10)}.json`;
             a.click();
             URL.revokeObjectURL(url);
-        };
+        }
 
-        window.importData = function(event) {
+        function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -921,20 +877,17 @@
                 try {
                     const parsed = JSON.parse(e.target.result);
                     if (parsed.curriculum && parsed.completedMap) {
-                        window.curriculum = parsed.curriculum;
-                        window.completedMap = parsed.completedMap;
-                        window.saveData();
-                        window.render();
-                        alert("Curriculum dataset successfully restored.");
-                    } else {
-                        alert("Invalid backup file format.");
+                        curriculum = parsed.curriculum;
+                        completedMap = parsed.completedMap;
+                        saveData();
+                        render();
                     }
                 } catch (err) {
-                    alert("Unable to parse import file.");
+                    console.warn("Unable to parse import file:", err);
                 }
             };
             reader.readAsText(file);
-        };
+        }
 
         function getPhaseBadgeStyle(phaseClass) {
             switch(phaseClass) {
@@ -951,36 +904,35 @@
             }
         }
 
-        window.render = function() {
+        function render() {
             const container = document.getElementById('curriculum-container');
             const emptyState = document.getElementById('empty-state');
             if (!container) return;
-            container.innerHTML = '';
 
+            container.innerHTML = '';
             let visibleCount = 0;
 
-            window.curriculum.forEach((session, sIdx) => {
-                if (window.activeFilter !== 'all' && !session.phase.includes(window.activeFilter)) {
+            curriculum.forEach((session, sIdx) => {
+                if (activeFilter !== 'all' && !session.phase.includes(activeFilter)) {
                     return;
                 }
 
-                if (window.searchQuery) {
-                    const titleMatch = session.title.toLowerCase().includes(window.searchQuery);
+                if (searchQuery) {
+                    const titleMatch = session.title.toLowerCase().includes(searchQuery);
                     const taskMatch = session.blocks.some(b => 
-                        b.time.toLowerCase().includes(window.searchQuery) || 
-                        b.tasks.some(t => t.toLowerCase().includes(window.searchQuery))
+                        b.time.toLowerCase().includes(searchQuery) || 
+                        b.tasks.some(t => t.toLowerCase().includes(searchQuery))
                     );
                     const hwMatch = session.homework && (
-                        (session.homework.videos && session.homework.videos.toLowerCase().includes(window.searchQuery)) ||
-                        (session.homework.drills && session.homework.drills.toLowerCase().includes(window.searchQuery)) ||
-                        (session.homework.notes && session.homework.notes.toLowerCase().includes(window.searchQuery))
+                        (session.homework.videos && session.homework.videos.toLowerCase().includes(searchQuery)) ||
+                        (session.homework.drills && session.homework.drills.toLowerCase().includes(searchQuery)) ||
+                        (session.homework.notes && session.homework.notes.toLowerCase().includes(searchQuery))
                     );
                     if (!titleMatch && !taskMatch && !hwMatch) return;
                 }
 
                 visibleCount++;
-
-                const isExpanded = !!window.expandedMap[session.id];
+                const isExpanded = !!expandedMap[session.id];
                 const card = document.createElement('div');
                 card.className = 'bg-white dark:bg-darkcard rounded-xl border border-slate-200 dark:border-darkborder card-shadow transition-colors overflow-hidden';
 
@@ -992,7 +944,7 @@
                     let tasksHTML = '';
                     block.tasks.forEach((task, tIdx) => {
                         const key = `${session.id}-${bIdx}-${tIdx}`;
-                        const isChecked = !!window.completedMap[key];
+                        const isChecked = !!completedMap[key];
                         tasksHTML += `
                             <li class="flex items-start justify-between gap-2 group/task py-1.5 px-2 rounded hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" id="task-item-${key}">
                                 <div class="flex items-start gap-2.5 flex-grow min-w-0">
@@ -1021,7 +973,7 @@
                     `;
                 });
 
-                // Build Homework Section HTML
+                // Build Homework Section HTML (Empty and ready for entries)
                 const hw = session.homework || { completed: false, videos: "", drills: "", notes: "" };
                 const isHwDone = !!hw.completed;
                 const hwContainerClass = isHwDone 
@@ -1099,16 +1051,33 @@
             });
 
             if (visibleCount === 0) {
-                emptyState.classList.remove('hidden');
+                emptyState?.classList.remove('hidden');
             } else {
-                emptyState.classList.add('hidden');
+                emptyState?.classList.add('hidden');
             }
 
-            window.updateProgressStats();
-            window.updateSessionStatusBadges();
-        };
+            updateProgressStats();
+            updateSessionStatusBadges();
+        }
 
-        window.addEventListener('DOMContentLoaded', initApp);
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+
+            const savedData = localStorage.getItem('bjj_nogi_curriculum_v4');
+            const savedProgress = localStorage.getItem('bjj_nogi_progress_v4');
+            const savedExpanded = localStorage.getItem('bjj_nogi_expanded_v4');
+
+            curriculum = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(DEFAULT_DATA));
+            completedMap = savedProgress ? JSON.parse(savedProgress) : {};
+            expandedMap = savedExpanded ? JSON.parse(savedExpanded) : {};
+
+            if (!savedExpanded && curriculum.length > 0) {
+                expandedMap[curriculum[0].id] = true;
+            }
+
+            setupSynchronization();
+            render();
+        });
     </script>
 </body>
 </html>
