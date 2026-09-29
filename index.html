@@ -8,37 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        surface: {
-                            bg: '#f8fafc',
-                            card: '#ffffff',
-                            border: '#e2e8f0',
-                            borderMuted: '#f1f5f9',
-                        },
-                        content: {
-                            main: '#0f172a',
-                            muted: '#64748b',
-                            subtle: '#94a3b8',
-                        },
-                        badge: {
-                            phase1Bg: '#fef2f2',
-                            phase1Text: '#991b1b',
-                            phase1Border: '#fecaca',
-                            
-                            phase2Bg: '#fffbeb',
-                            phase2Text: '#92400e',
-                            phase2Border: '#fef3c7',
-
-                            phase3Bg: '#f0fdf4',
-                            phase3Text: '#166534',
-                            phase3Border: '#bbf7d0',
-
-                            phase4Bg: '#f5f3ff',
-                            phase4Text: '#5b21b6',
-                            phase4Border: '#ddd6fe',
-                        }
+                        darkbg: '#0b0f19',
+                        darkcard: '#121827',
+                        darkborder: '#1f293d',
+                        darkmuted: '#334155',
                     },
                     fontFamily: {
                         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
@@ -54,37 +31,31 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            color: #0f172a;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         .card-shadow {
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
         }
 
-        .card-shadow-hover {
-            transition: all 0.2s ease-in-out;
-        }
-
-        .card-shadow-hover:hover {
-            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
-            border-color: #cbd5e1;
+        .dark .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
 
         .editable-field {
             outline: none;
             border-radius: 4px;
-            padding: 1px 3px;
+            padding: 2px 4px;
             transition: background-color 0.15s ease;
         }
 
         .editable-field:focus {
-            background-color: #f1f5f9;
-            box-shadow: 0 0 0 1px #cbd5e1;
+            background-color: rgba(148, 163, 184, 0.15);
+            box-shadow: 0 0 0 1px #94a3b8;
         }
 
-        /* Clean Minimal Checkbox */
+        /* Minimal Checkbox */
         .minimal-checkbox {
             appearance: none;
             background-color: #ffffff;
@@ -98,6 +69,11 @@
             cursor: pointer;
             transition: all 0.15s ease;
             flex-shrink: 0;
+        }
+
+        .dark .minimal-checkbox {
+            background-color: #1e293b;
+            border-color: #475569;
         }
 
         .minimal-checkbox:hover {
@@ -119,16 +95,24 @@
             border-color: #0f172a;
         }
 
+        .dark .minimal-checkbox:checked {
+            background-color: #38bdf8;
+            border-color: #38bdf8;
+        }
+
+        .dark .minimal-checkbox:checked::before {
+            background-color: #0f172a;
+        }
+
         .minimal-checkbox:checked::before {
             transform: scale(1);
         }
 
         .modal-backdrop {
-            background: rgba(15, 23, 42, 0.25);
+            background: rgba(15, 23, 42, 0.4);
             backdrop-filter: blur(4px);
         }
 
-        /* Hide scrollbars gracefully */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -138,33 +122,48 @@
         }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="bg-slate-50 text-slate-900 dark:bg-darkbg dark:text-slate-100 min-h-screen pb-20">
 
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <header class="bg-white dark:bg-darkcard border-b border-slate-200 dark:border-darkborder sticky top-0 z-30 transition-colors">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <div class="flex items-center gap-3">
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900">No-Gi BJJ Fundamentals Tracker</h1>
-                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">13-Week Curriculum</span>
+                        <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">No-Gi BJJ Fundamentals Tracker</h1>
+                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">13-Week Private Curriculum</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">1-on-1 Private Technical Matrix & No-Gi Progression Log</p>
+                    <!-- 1. PROGRAMME SUMMARY -->
+                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed max-w-3xl">
+                        <strong class="font-semibold text-slate-800 dark:text-slate-200">Programme Overview:</strong> A structured 13-week private coaching blueprint moving sequentially through Escapes, Guard Retention & Sweeps, Top Game Passing, and Submissions. Every 60-minute module integrates active hand-fighting warmups, technical breakdowns, spaced-repetition positional sparring, and dedicated homework logs.
+                    </p>
                 </div>
 
-                <!-- Global Action Buttons -->
+                <!-- Global Action Controls & Dark Mode Toggle -->
                 <div class="flex items-center flex-wrap gap-2">
-                    <button onclick="openModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors">
+                    <!-- 2. DARK MODE ICON TOGGLE BUTTON -->
+                    <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors" title="Toggle Light / Dark Mode">
+                        <!-- Sun Icon (shown in Dark Mode) -->
+                        <svg id="sun-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <!-- Moon Icon (shown in Light Mode) -->
+                        <svg id="moon-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+
+                    <button onclick="openModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 dark:text-slate-950 text-white font-medium text-xs transition-colors">
                         Add Session
                     </button>
-                    <div class="h-4 w-[1px] bg-slate-200 mx-1 hidden sm:block"></div>
-                    <button onclick="exportData()" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium transition-colors">
+                    <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+                    <button onclick="exportData()" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium transition-colors">
                         Export
                     </button>
-                    <label class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium cursor-pointer transition-colors">
+                    <label class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium cursor-pointer transition-colors">
                         Import
                         <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
                     </label>
-                    <button onclick="resetToDefault()" class="px-3 py-1.5 rounded-lg bg-white hover:bg-red-50 text-red-600 border border-slate-200 text-xs font-medium transition-colors">
+                    <button onclick="resetToDefault()" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950 text-red-600 dark:text-red-400 border border-slate-200 dark:border-slate-700 text-xs font-medium transition-colors">
                         Reset
                     </button>
                 </div>
@@ -172,87 +171,87 @@
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
-        <!-- Progress Matrix -->
-        <div class="bg-white rounded-xl p-6 border border-slate-200 card-shadow space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+        <!-- Progress Metrics Bar -->
+        <div class="bg-white dark:bg-darkcard rounded-xl p-5 border border-slate-200 dark:border-darkborder card-shadow space-y-4 transition-colors">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                    <span class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Overall Completion</span>
-                    <div class="flex items-baseline gap-3 mt-1">
-                        <span id="stat-percentage" class="text-3xl font-bold text-slate-900">0%</span>
-                        <span id="stat-tasks" class="text-xs font-medium text-slate-500">0 / 0 Drills Completed</span>
+                    <span class="text-[11px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Overall Completion</span>
+                    <div class="flex items-baseline gap-3 mt-0.5">
+                        <span id="stat-percentage" class="text-3xl font-bold text-slate-900 dark:text-white">0%</span>
+                        <span id="stat-tasks" class="text-xs font-medium text-slate-500 dark:text-slate-400">0 / 0 Drills Completed</span>
                     </div>
                 </div>
                 <div class="text-left sm:text-right">
-                    <span class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Mastered Sessions</span>
-                    <div class="mt-1">
-                        <span id="stat-sessions" class="text-xl font-bold text-slate-800">0</span>
-                        <span id="stat-sessions-total" class="text-xs font-medium text-slate-500">/ 13 Sessions</span>
+                    <span class="text-[11px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Mastered Sessions</span>
+                    <div class="mt-0.5">
+                        <span id="stat-sessions" class="text-xl font-bold text-slate-800 dark:text-slate-200">0</span>
+                        <span id="stat-sessions-total" class="text-xs font-medium text-slate-500 dark:text-slate-400">/ 13 Sessions</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Light Progress Bar -->
-            <div class="space-y-2">
-                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div id="progress-fill" class="h-full bg-slate-800 rounded-full transition-all duration-300" style="width: 0%;"></div>
+            <!-- Progress Fill Bar -->
+            <div class="space-y-1.5">
+                <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div id="progress-fill" class="h-full bg-slate-900 dark:bg-sky-500 rounded-full transition-all duration-300" style="width: 0%;"></div>
                 </div>
-                <div class="flex justify-between items-center text-xs text-slate-500">
+                <div class="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
                     <span id="stat-status-text" class="font-medium">Ready to begin</span>
-                    <span class="text-slate-400">Target: 100% Mastery</span>
+                    <span class="text-slate-400 dark:text-slate-500">Target: 100% Mastery</span>
                 </div>
             </div>
 
             <!-- Phase Quick Legend -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div class="px-3 py-2 rounded-lg bg-red-50/60 border border-red-200/60">
-                    <div class="text-xs font-semibold text-red-800">Phase 1: Escapes</div>
-                    <div class="text-[11px] text-red-600/80">Underhooks & Frame Recovery</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+                <div class="px-3 py-1.5 rounded-lg bg-red-50/70 dark:bg-red-950/40 border border-red-200/60 dark:border-red-900/40">
+                    <div class="text-xs font-semibold text-red-800 dark:text-red-300">Phase 1: Escapes</div>
+                    <div class="text-[10px] text-red-600/80 dark:text-red-400/80">Frames & Underhooks</div>
                 </div>
-                <div class="px-3 py-2 rounded-lg bg-amber-50/60 border border-amber-200/60">
-                    <div class="text-xs font-semibold text-amber-800">Phase 2: Guards</div>
-                    <div class="text-[11px] text-amber-600/80">Seated, Butterfly & Sweeps</div>
+                <div class="px-3 py-1.5 rounded-lg bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-900/40">
+                    <div class="text-xs font-semibold text-amber-800 dark:text-amber-300">Phase 2: Guards</div>
+                    <div class="text-[10px] text-amber-600/80 dark:text-amber-400/80">Seated, Butterfly & Sweeps</div>
                 </div>
-                <div class="px-3 py-2 rounded-lg bg-emerald-50/60 border border-emerald-200/60">
-                    <div class="text-xs font-semibold text-emerald-800">Phase 3: Top Game</div>
-                    <div class="text-[11px] text-emerald-600/80">Leg Drag & Knee Cut Passing</div>
+                <div class="px-3 py-1.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-900/40">
+                    <div class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Phase 3: Top Game</div>
+                    <div class="text-[10px] text-emerald-600/80 dark:text-emerald-400/80">Leg Drag & Knee Cut Passing</div>
                 </div>
-                <div class="px-3 py-2 rounded-lg bg-purple-50/60 border border-purple-200/60">
-                    <div class="text-xs font-semibold text-purple-800">Phase 4: Finishes</div>
-                    <div class="text-[11px] text-purple-600/80">Submissions & Flow Integration</div>
+                <div class="px-3 py-1.5 rounded-lg bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-900/40">
+                    <div class="text-xs font-semibold text-purple-800 dark:text-purple-300">Phase 4: Finishes</div>
+                    <div class="text-[10px] text-purple-600/80 dark:text-purple-400/80">Submissions & Live Flow</div>
                 </div>
             </div>
         </div>
 
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-1">
             <!-- Filter Tabs -->
             <div class="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
-                <button onclick="setFilter('all')" id="filter-all" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-900 text-white">
+                <button onclick="setFilter('all')" id="filter-all" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950">
                     All Modules
                 </button>
-                <button onclick="setFilter('Phase 1')" id="filter-Phase 1" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors">
+                <button onclick="setFilter('Phase 1')" id="filter-Phase 1" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                     Escapes
                 </button>
-                <button onclick="setFilter('Phase 2')" id="filter-Phase 2" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors">
+                <button onclick="setFilter('Phase 2')" id="filter-Phase 2" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                     Guards
                 </button>
-                <button onclick="setFilter('Phase 3')" id="filter-Phase 3" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors">
+                <button onclick="setFilter('Phase 3')" id="filter-Phase 3" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                     Top Game
                 </button>
-                <button onclick="setFilter('Phase 4')" id="filter-Phase 4" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors">
+                <button onclick="setFilter('Phase 4')" id="filter-Phase 4" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                     Finishes
                 </button>
             </div>
 
-            <!-- Search and View Toggles -->
+            <!-- Search & Expand Controls -->
             <div class="flex items-center gap-2">
-                <input type="text" id="search-input" placeholder="Search techniques, grips, or drills..." oninput="handleSearch()" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all w-full md:w-60">
+                <input type="text" id="search-input" placeholder="Search drills, grips, or submissions..." oninput="handleSearch()" class="px-3 py-1.5 rounded-lg bg-white dark:bg-darkcard border border-slate-200 dark:border-darkborder text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-all w-full md:w-60">
 
-                <button onclick="toggleAllSessions(true)" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors" title="Expand All">
+                <button onclick="toggleAllSessions(true)" class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-darkcard border border-slate-200 dark:border-darkborder text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium transition-colors" title="Expand All">
                     Expand All
                 </button>
-                <button onclick="toggleAllSessions(false)" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors" title="Collapse All">
+                <button onclick="toggleAllSessions(false)" class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-darkcard border border-slate-200 dark:border-darkborder text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium transition-colors" title="Collapse All">
                     Collapse All
                 </button>
             </div>
@@ -260,36 +259,36 @@
 
         <!-- Curriculum Container -->
         <div id="curriculum-container" class="space-y-4">
-            <!-- Dynamic Cards Injected Here -->
+            <!-- Dynamic Curriculum Rendered Here -->
         </div>
 
         <!-- Empty State -->
-        <div id="empty-state" class="hidden bg-white rounded-xl p-10 text-center border border-slate-200 space-y-2">
-            <p class="text-sm font-semibold text-slate-700">No matching training modules found</p>
-            <p class="text-xs text-slate-500">Try adjusting your filter parameters or search term.</p>
+        <div id="empty-state" class="hidden bg-white dark:bg-darkcard rounded-xl p-10 text-center border border-slate-200 dark:border-darkborder space-y-2">
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">No matching training modules found</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Try adjusting your filter options or search terms.</p>
         </div>
 
     </main>
 
-    <!-- Modal for Adding Custom Sessions -->
+    <!-- Modal Dialog for Creating Custom Sessions -->
     <div id="add-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden opacity-0 transition-opacity duration-200">
-        <div class="bg-white rounded-xl border border-slate-200 w-full max-w-md p-6 m-4 card-shadow relative space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Add Training Session</h2>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-xs font-bold">
+        <div class="bg-white dark:bg-darkcard rounded-xl border border-slate-200 dark:border-darkborder w-full max-w-md p-6 m-4 card-shadow relative space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h2 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">Add Training Session</h2>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold">
                     Close
                 </button>
             </div>
 
             <form id="add-session-form" onsubmit="handleCreateSession(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Session Title</label>
-                    <input type="text" id="new-title" required placeholder="e.g. Session 14: K-Guard Entries & Heel Hook Defense" class="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-slate-400 transition-all">
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Session Title</label>
+                    <input type="text" id="new-title" required placeholder="e.g. Session 14: K-Guard Entries & Heel Hook Defense" class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-slate-400 transition-all">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Curriculum Phase Focus</label>
-                    <select id="new-phase" class="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-slate-400 transition-all">
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Curriculum Phase Focus</label>
+                    <select id="new-phase" class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-slate-400 transition-all">
                         <option value="Phase 1: Escapes|phase-1">Phase 1: Escapes & Frames</option>
                         <option value="Phase 2: Guards|phase-2">Phase 2: Guards & Retention</option>
                         <option value="Phase 3: Top Game|phase-3">Phase 3: Top Game & Passing</option>
@@ -299,14 +298,15 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-colors">Cancel</button>
-                    <button type="submit" class="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors">Create Session</button>
+                    <button type="button" onclick="closeModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium transition-colors">Cancel</button>
+                    <button type="submit" class="px-4 py-1.5 rounded-lg bg-slate-900 dark:bg-sky-500 hover:bg-slate-800 dark:hover:bg-sky-400 text-white dark:text-slate-950 text-xs font-medium transition-colors">Create Session</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
+        // 3. FULL NO-GI CURRICULUM DATASET WITH HOMEWORK BLOCKS
         const DEFAULT_DATA = [
             {
                 id: 1,
@@ -314,12 +314,18 @@
                 phase: "Phase 1: Escapes",
                 phaseClass: "phase-1",
                 blocks: [
-                    { time: "00-10m | Warmup & Hand-Fighting", tasks: ["Ukemi (break-falls) & hip-escape drills", "No-Gi hand-fighting: Wrist control & biceps pummeling"] },
+                    { time: "00-10m | Warmup & Hand-Fighting", tasks: ["Ukemi (break-falls) & hip-escape drills across mat", "No-Gi hand-fighting: Wrist control & biceps pummeling"] },
                     { time: "10-25m | Technical Alignment & Frames", tasks: ["Forearm frame on throat/neck & hip frame with far-side hand", "Preventing head control & chest-to-chest weight absorption"] },
                     { time: "25-35m | Technical Escape Mechanics", tasks: ["Hip-escape (Shrimp) to create space -> Insert knee shield", "Recovering Seated Guard / Underhook Half Guard"] },
                     { time: "35-50m | Positional Sparring", tasks: ["Start in bottom Side Control (Top uses crossface/underhook)", "Bottom: Recover Guard or Underhook / Top: Hold pin or isolate arm"] },
                     { time: "50-60m | Q&A / Leg Awareness", tasks: ["Troubleshooting collapsed frames under heavy shoulder pressure", "Leg safety: Hiding legs during guard recovery to avoid leg grabs"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+side+control+frame+escapes",
+                    drills: "Solo shrimping drills (3x20 reps); Frame placement drills against wall",
+                    notes: "Focus on keeping the forearm frame glued to the throat line before shrimping."
+                }
             },
             {
                 id: 2,
@@ -332,7 +338,13 @@
                     { time: "25-35m | Elbow-Knee Escape", tasks: ["Turning to hip, framing opponent's hip knee with forearm", "Sliding lower leg out to recover Half Guard or Butterfly hooks"] },
                     { time: "35-50m | Positional Sparring", tasks: ["Start in bottom Mount", "Bottom: Escape to Guard or Top / Top: Maintain Mount or attack Guillotine"] },
                     { time: "50-60m | Q&A / Review", tasks: ["Reading top player's weight distribution (High vs Low Mount mechanics)"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+mount+upa+elbow+knee+escape",
+                    drills: "Upa bridges onto shoulder (3x15); Elbow-knee hip turn drills on mat",
+                    notes: "Bridge at 45 degrees over the trapped arm shoulder, not straight up."
+                }
             },
             {
                 id: 3,
@@ -345,7 +357,13 @@
                     { time: "25-35m | Escape Mechanics", tasks: ["Sliding hips down, clearing top hooks with bottom leg", "Shoulders to mat, turning hips into opponent to recover Top Guard"] },
                     { time: "35-50m | Positional Sparring", tasks: ["Start in back control with seatbelt locked (no gi grips)", "Bottom: Escape to top or guard / Top: Secure RNC or retain back"] },
                     { time: "50-60m | Q&A / Leg Entanglement Intro", tasks: ["Neck defense troubleshooting against strong arm-wraps", "Leg entanglement awareness: Avoiding ankle clips & calf slicer pressure"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+back+escape+2+on+1+hand+control",
+                    drills: "2-on-1 grip retention practice; Hip sliding and hook clearance drills",
+                    notes: "Always fall to the underhook side (safe side) whenever possible."
+                }
             },
             {
                 id: 4,
@@ -358,7 +376,13 @@
                     { time: "25-35m | Deep Underhook Entry", tasks: ["Shooting underhook as top player shifts weight", "Building to knee (Dogbar position) -> Sweep or back take"] },
                     { time: "35-50m | Positional Sparring (Spaced Repetition)", tasks: ["Start in Bottom Half Guard", "Bottom: Underhook sweep or recover / Top: Crossface, flatten or pass"] },
                     { time: "50-60m | Q&A / Review", tasks: ["Head positioning adjustments to prevent top Guillotine or D'Arce counter"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+half+guard+underhook+dogbar",
+                    drills: "Knee shield retention drills; Underhook to build-to-knees reps",
+                    notes: "Keep your forehead tucked against their chest line to eliminate D'Arce attacks."
+                }
             },
             {
                 id: 5,
@@ -371,7 +395,13 @@
                     { time: "25-35m | Butterfly Elevator Sweep", tasks: ["Forward kuzushi (off-balancing) using underhook & triceps grip", "Elevator hook lifting hips to execute sweep into Mount"] },
                     { time: "35-50m | Positional Sparring", tasks: ["Start seated vs standing or kneeling passer", "Bottom: Sweep, arm drag or recover / Top: Disengage, flatten or pass"] },
                     { time: "50-60m | Q&A / Leg Lock Defense", tasks: ["Distance management when top stands up", "Straight ankle lock defense intro: Booting foot & turning hip out"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+butterfly+guard+elevator+sweep+arm+drag",
+                    drills: "Arm drag scooting drills; Butterfly hook elevation against wall/bag",
+                    notes: "Load their weight onto your shins before attempting the elevator lift."
+                }
             },
             {
                 id: 6,
@@ -384,7 +414,13 @@
                     { time: "25-35m | Re-Guarding Mechanics", tasks: ["Pushing opponent's shoulders with double palm frames to create space", "Re-establishing Closed Guard with overhook control"] },
                     { time: "35-50m | Positional Sparring (Spaced Repetition)", tasks: ["Pass vs Guard retention using Butterfly, Half, and Closed Guard", "Revisiting Side Control frame recovery if guard is passed"] },
                     { time: "50-60m | Q&A / Review", tasks: ["Energy conservation and breathing while managing heavy top pressure"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+guard+retention+reguarding+pummeling",
+                    drills: "Leg pummeling circles (3x1 min); Double palm push frame recoveries",
+                    notes: "Transition fluidly between guards before your opponent settles their weight."
+                }
             },
             {
                 id: 7,
@@ -397,7 +433,13 @@
                     { time: "25-35m | Hip Bump & Pendulum Sweeps", tasks: ["Hip Bump Sweep when top player postures back", "Pendulum (Flower) Sweep when top player posts hand or defends sit-up"] },
                     { time: "35-50m | Positional Sparring", tasks: ["Start in Closed Guard", "Bottom: Arm drag back take, Hip Bump, or Pendulum / Top: Break guard"] },
                     { time: "50-60m | Q&A / Review", tasks: ["Preventing posture loss and head control in Closed Guard"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+closed+guard+arm+drag+pendulum+sweep",
+                    drills: "Hip bump sit-ups (3x15); Arm drag pulling reps with resistance band",
+                    notes: "Pull the triceps across aggressively while pulling knees to chest."
+                }
             },
             {
                 id: 8,
@@ -410,7 +452,13 @@
                     { time: "25-35m | Finishing Mechanics", tasks: ["Kimura: 2-on-1 wrist lock, rotating shoulder without losing guard", "Guillotine: Arm-in or High-Elbow choke closure with hip extension"] },
                     { time: "35-50m | Positional Sparring (Spaced Repetition)", tasks: ["Closed Guard attack chains", "Revisiting Back Escapes if back take fails during arm drag"] },
                     { time: "50-60m | Q&A / Leg Safety", tasks: ["Adjusting choke angles without exposing legs to leg-tangle passes"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+guillotine+kimura+dilemma+closed+guard",
+                    drills: "High guard hip climb reps; Figure-four grip transitions",
+                    notes: "Use the Hip Bump threat to force them to react, opening up the choke or lock."
+                }
             },
             {
                 id: 9,
@@ -423,7 +471,13 @@
                     { time: "25-35m | Knee Cut & Split-Squat Pass", tasks: ["Establishing underhook + far-side wrist control on seated/half guard", "Driving knee diagonally across thigh to slice through"] },
                     { time: "35-50m | Positional Sparring", tasks: ["Start in Open Guard / Seated Guard", "Top: Leg Drag or Knee Cut pass / Bottom: Seated guard recovery or sweep"] },
                     { time: "50-60m | Q&A / Leg Lock Defense", tasks: ["Single-Leg X (SLX) Awareness: Hiding ankles from bottom entries during passes"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+leg+drag+knee+cut+passing",
+                    drills: "Leg drag step-and-pin footwork; Knee cut slide reps on dummy/mat",
+                    notes: "Keep your lead ankle tucked behind your butt during passing to deny leg entries."
+                }
             },
             {
                 id: 10,
@@ -436,7 +490,13 @@
                     { time: "25-35m | Front Headlock Control & Spin", tasks: ["Sprawling on shot -> Securing chin strap & armpit control", "Spinning to take back or executing Go-Behind"] },
                     { time: "35-50m | Positional Sparring", tasks: ["Top in Half Guard or Front Headlock", "Top: Pass Half Guard or spin to back / Bottom: Underhook sweep or stand"] },
                     { time: "50-60m | Q&A / Review", tasks: ["Underhook retention and preventing bottom player from building to knees"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+front+headlock+sprawl+knee+cut+half+guard",
+                    drills: "Sprawl-and-spin drills; Chin-strap and armpit grip retention",
+                    notes: "Heavy chest pressure on the back of their neck prevents them from standing."
+                }
             },
             {
                 id: 11,
@@ -449,7 +509,13 @@
                     { time: "25-35m | Transitioning to Mount", tasks: ["Sliding knee across belly to Mount while controlling far arm", "Avoiding getting caught in bottom Half Guard"] },
                     { time: "35-50m | Positional Sparring (Spaced Repetition)", tasks: ["Top in Side Control", "Top: Hold 90s or transition to Mount / Bottom: Use Session 1 frame escape"] },
                     { time: "50-60m | Q&A / Review", tasks: ["Weight distribution adjustments to maintain chest contact without gapping"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+side+control+pressure+mount+transition",
+                    drills: "Knee-on-belly side switches; Crossface shoulder pressure alignment",
+                    notes: "Turn their head away using crossface pressure before attempting the Mount transition."
+                }
             },
             {
                 id: 12,
@@ -462,7 +528,13 @@
                     { time: "25-35m | Taking the Back from Mount", tasks: ["Opponent turns away to escape Mount -> Slide seatbelt grip", "Inserting hooks / Body triangle to secure Rear-Naked Choke (RNC)"] },
                     { time: "35-50m | Positional Sparring", tasks: ["Top position start (Side or Mount)", "Top: Submit with Americana/Kimura/RNC / Bottom: Escape using Upa or Frames"] },
                     { time: "50-60m | Q&A / Review", tasks: ["Arm-based RNC mechanics: Biceps lock without reliance on gi fabric"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+kimura+americana+mount+rnc",
+                    drills: "Figure-four grip speed drills; S-mount transitions",
+                    notes: "Keep your chest tight to their back as they turn to prevent them clearing space."
+                }
             },
             {
                 id: 13,
@@ -474,7 +546,13 @@
                     { time: "10-25m | Linking the Full Chain", tasks: ["Seated Entry -> Guard Sweep -> Leg Drag / Knee Cut -> Side Control -> Mount -> Sub"] },
                     { time: "25-45m | Live Positional Rounds (Spaced Repetition)", tasks: ["3-minute rounds covering Escapes, Guards, Passes, and Finishes with real-time feedback"] },
                     { time: "45-60m | Final Assessment & Roadmap", tasks: ["Evaluating defense, passing, guard retention & identifying personal development areas"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "https://youtube.com/results?search_query=no+gi+bjj+flow+rolling+positional+sparring",
+                    drills: "Full sequence shadow grappling (5x2 mins); Weak-point specific drilling",
+                    notes: "Review overall strengths across Escapes, Guards, Passes, and Finishes to guide open mat training."
+                }
             }
         ];
 
@@ -484,10 +562,44 @@
         let activeFilter = 'all';
         let searchQuery = '';
 
+        function initTheme() {
+            const savedTheme = localStorage.getItem('bjj_theme');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('bjj_theme', isDark ? 'dark' : 'light');
+            
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            
+            if (isDark) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
         function init() {
-            const savedData = localStorage.getItem('bjj_nogi_curriculum_data_v1');
-            const savedProgress = localStorage.getItem('bjj_nogi_progress_v1');
-            const savedExpanded = localStorage.getItem('bjj_nogi_expanded_v1');
+            initTheme();
+
+            const savedData = localStorage.getItem('bjj_nogi_curriculum_data_v2');
+            const savedProgress = localStorage.getItem('bjj_nogi_progress_v2');
+            const savedExpanded = localStorage.getItem('bjj_nogi_expanded_v2');
 
             curriculum = savedData ? JSON.parse(savedData) : DEFAULT_DATA;
             completedMap = savedProgress ? JSON.parse(savedProgress) : {};
@@ -495,16 +607,15 @@
 
             if (!savedExpanded && curriculum.length > 0) {
                 expandedMap[curriculum[0].id] = true;
-                if (curriculum[1]) expandedMap[curriculum[1].id] = true;
             }
 
             render();
         }
 
         function saveData() {
-            localStorage.setItem('bjj_nogi_curriculum_data_v1', JSON.stringify(curriculum));
-            localStorage.setItem('bjj_nogi_progress_v1', JSON.stringify(completedMap));
-            localStorage.setItem('bjj_nogi_expanded_v1', JSON.stringify(expandedMap));
+            localStorage.setItem('bjj_nogi_curriculum_data_v2', JSON.stringify(curriculum));
+            localStorage.setItem('bjj_nogi_progress_v2', JSON.stringify(completedMap));
+            localStorage.setItem('bjj_nogi_expanded_v2', JSON.stringify(expandedMap));
             updateProgressStats();
         }
 
@@ -513,10 +624,7 @@
                 curriculum = JSON.parse(JSON.stringify(DEFAULT_DATA));
                 completedMap = {};
                 expandedMap = {};
-                if (curriculum.length > 0) {
-                    expandedMap[curriculum[0].id] = true;
-                    if (curriculum[1]) expandedMap[curriculum[1].id] = true;
-                }
+                if (curriculum.length > 0) expandedMap[curriculum[0].id] = true;
                 saveData();
                 render();
             }
@@ -529,14 +637,39 @@
             const textEl = document.getElementById(`task-text-${key}`);
             if (textEl) {
                 if (completedMap[key]) {
-                    textEl.classList.add('line-through', 'text-slate-400');
-                    textEl.classList.remove('text-slate-700');
+                    textEl.classList.add('line-through', 'text-slate-400', 'dark:text-slate-500');
+                    textEl.classList.remove('text-slate-700', 'dark:text-slate-200');
                 } else {
-                    textEl.classList.remove('line-through', 'text-slate-400');
-                    textEl.classList.add('text-slate-700');
+                    textEl.classList.remove('line-through', 'text-slate-400', 'dark:text-slate-500');
+                    textEl.classList.add('text-slate-700', 'dark:text-slate-200');
                 }
             }
             updateSessionStatusBadges();
+        }
+
+        function toggleHomeworkComplete(sessionIdx) {
+            if (!curriculum[sessionIdx].homework) {
+                curriculum[sessionIdx].homework = { completed: false, videos: "", drills: "", notes: "" };
+            }
+            curriculum[sessionIdx].homework.completed = !curriculum[sessionIdx].homework.completed;
+            saveData();
+            
+            const containerEl = document.getElementById(`hw-container-${curriculum[sessionIdx].id}`);
+            if (containerEl) {
+                if (curriculum[sessionIdx].homework.completed) {
+                    containerEl.className = "mt-4 p-3.5 rounded-lg border bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 space-y-3 transition-colors";
+                } else {
+                    containerEl.className = "mt-4 p-3.5 rounded-lg border bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 space-y-3 transition-colors";
+                }
+            }
+        }
+
+        function updateHomeworkField(sessionIdx, field, newText) {
+            if (!curriculum[sessionIdx].homework) {
+                curriculum[sessionIdx].homework = { completed: false, videos: "", drills: "", notes: "" };
+            }
+            curriculum[sessionIdx].homework[field] = newText;
+            saveData();
         }
 
         function toggleSessionCollapse(sessionId) {
@@ -558,9 +691,7 @@
         }
 
         function toggleAllSessions(expand) {
-            curriculum.forEach(s => {
-                expandedMap[s.id] = expand;
-            });
+            curriculum.forEach(s => expandedMap[s.id] = expand);
             saveData();
             render();
         }
@@ -568,14 +699,14 @@
         function setFilter(phase) {
             activeFilter = phase;
             document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('bg-slate-900', 'text-white');
-                btn.classList.add('text-slate-600');
+                btn.classList.remove('bg-slate-900', 'text-white', 'dark:bg-sky-500', 'dark:text-slate-950');
+                btn.classList.add('text-slate-600', 'dark:text-slate-400');
             });
 
             const activeBtn = document.getElementById(`filter-${phase}`);
             if (activeBtn) {
-                activeBtn.classList.add('bg-slate-900', 'text-white');
-                activeBtn.classList.remove('text-slate-600');
+                activeBtn.classList.add('bg-slate-900', 'text-white', 'dark:bg-sky-500', 'dark:text-slate-950');
+                activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
             }
             render();
         }
@@ -641,13 +772,13 @@
                 const badgeEl = document.getElementById(`status-badge-${session.id}`);
                 if (badgeEl) {
                     if (total > 0 && checked === total) {
-                        badgeEl.className = "px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200";
+                        badgeEl.className = "px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800";
                         badgeEl.innerText = "Completed";
                     } else if (checked > 0) {
-                        badgeEl.className = "px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200";
+                        badgeEl.className = "px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800";
                         badgeEl.innerText = `${checked}/${total} Tasks`;
                     } else {
-                        badgeEl.className = "px-2 py-0.5 rounded text-[11px] font-medium bg-slate-50 text-slate-500 border border-slate-200";
+                        badgeEl.className = "px-2 py-0.5 rounded text-[11px] font-medium bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700";
                         badgeEl.innerText = "Pending";
                     }
                 }
@@ -667,7 +798,7 @@
         }
 
         function addTask(sessionIdx, blockIdx) {
-            curriculum[sessionIdx].blocks[blockIdx].tasks.push("New technique note");
+            curriculum[sessionIdx].blocks[blockIdx].tasks.push("New technical drill");
             expandedMap[curriculum[sessionIdx].id] = true;
             saveData();
             render();
@@ -690,17 +821,13 @@
         function openModal() {
             const modal = document.getElementById('add-modal');
             modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-            }, 10);
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
         }
 
         function closeModal() {
             const modal = document.getElementById('add-modal');
             modal.classList.add('opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
+            setTimeout(() => modal.classList.add('hidden'), 200);
         }
 
         function handleCreateSession(e) {
@@ -720,7 +847,13 @@
                     { time: "00-15m | Warmup & Hand-Fighting", tasks: ["Hand-fighting drill"] },
                     { time: "15-45m | Technique", tasks: ["Core movement practice"] },
                     { time: "45-60m | Positional Sparring", tasks: ["Live testing round"] }
-                ]
+                ],
+                homework: {
+                    completed: false,
+                    videos: "",
+                    drills: "",
+                    notes: ""
+                }
             });
 
             expandedMap[newId] = true;
@@ -758,7 +891,7 @@
                         completedMap = parsed.completedMap;
                         saveData();
                         render();
-                        alert("Curriculum progress successfully restored.");
+                        alert("Curriculum dataset successfully restored.");
                     } else {
                         alert("Invalid backup file format.");
                     }
@@ -772,15 +905,15 @@
         function getPhaseBadgeStyle(phaseClass) {
             switch(phaseClass) {
                 case 'phase-1': 
-                    return 'bg-red-50 text-red-800 border-red-200';
+                    return 'bg-red-50 text-red-800 dark:bg-red-950/60 dark:text-red-300 border-red-200 dark:border-red-900/60';
                 case 'phase-2': 
-                    return 'bg-amber-50 text-amber-800 border-amber-200';
+                    return 'bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-900/60';
                 case 'phase-3': 
-                    return 'bg-emerald-50 text-emerald-800 border-emerald-200';
+                    return 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/60';
                 case 'phase-4': 
-                    return 'bg-purple-50 text-purple-800 border-purple-200';
+                    return 'bg-purple-50 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-900/60';
                 default: 
-                    return 'bg-slate-50 text-slate-700 border-slate-200';
+                    return 'bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
             }
         }
 
@@ -802,17 +935,23 @@
                         b.time.toLowerCase().includes(searchQuery) || 
                         b.tasks.some(t => t.toLowerCase().includes(searchQuery))
                     );
-                    if (!titleMatch && !taskMatch) return;
+                    const hwMatch = session.homework && (
+                        (session.homework.videos && session.homework.videos.toLowerCase().includes(searchQuery)) ||
+                        (session.homework.drills && session.homework.drills.toLowerCase().includes(searchQuery)) ||
+                        (session.homework.notes && session.homework.notes.toLowerCase().includes(searchQuery))
+                    );
+                    if (!titleMatch && !taskMatch && !hwMatch) return;
                 }
 
                 visibleCount++;
 
                 const isExpanded = !!expandedMap[session.id];
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-xl border border-slate-200 card-shadow card-shadow-hover overflow-hidden';
+                card.className = 'bg-white dark:bg-darkcard rounded-xl border border-slate-200 dark:border-darkborder card-shadow transition-colors overflow-hidden';
 
                 let phaseBadgeClass = getPhaseBadgeStyle(session.phaseClass);
 
+                // Build Time Blocks HTML
                 let blocksHTML = '';
                 session.blocks.forEach((block, bIdx) => {
                     let tasksHTML = '';
@@ -820,12 +959,12 @@
                         const key = `${session.id}-${bIdx}-${tIdx}`;
                         const isChecked = !!completedMap[key];
                         tasksHTML += `
-                            <li class="flex items-start justify-between gap-2 group/task py-1.5 px-2 rounded hover:bg-slate-50 transition-colors" id="task-item-${key}">
+                            <li class="flex items-start justify-between gap-2 group/task py-1.5 px-2 rounded hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" id="task-item-${key}">
                                 <div class="flex items-start gap-2.5 flex-grow min-w-0">
                                     <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleTask('${key}')" class="minimal-checkbox mt-0.5">
-                                    <span id="task-text-${key}" class="editable-field text-xs ${isChecked ? 'line-through text-slate-400' : 'text-slate-700'}" contenteditable="true" onblur="updateText(${sIdx}, ${bIdx}, ${tIdx}, this.innerText)">${task}</span>
+                                    <span id="task-text-${key}" class="editable-field text-xs ${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'}" contenteditable="true" onblur="updateText(${sIdx}, ${bIdx}, ${tIdx}, this.innerText)">${task}</span>
                                 </div>
-                                <button onclick="deleteTask(${sIdx}, ${bIdx}, ${tIdx})" class="opacity-0 group-hover/task:opacity-100 text-slate-300 hover:text-red-500 text-xs px-1 transition-opacity" title="Remove drill">
+                                <button onclick="deleteTask(${sIdx}, ${bIdx}, ${tIdx})" class="opacity-0 group-hover/task:opacity-100 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 text-xs px-1 transition-opacity" title="Remove drill">
                                     Delete
                                 </button>
                             </li>
@@ -833,11 +972,11 @@
                     });
 
                     blocksHTML += `
-                        <div class="bg-slate-50/50 rounded-lg p-3.5 border border-slate-100 flex flex-col justify-between space-y-2">
+                        <div class="bg-slate-50/50 dark:bg-slate-900/40 rounded-lg p-3.5 border border-slate-100 dark:border-slate-800/80 flex flex-col justify-between space-y-2">
                             <div>
-                                <div class="flex items-center justify-between gap-2 border-b border-slate-200/60 pb-2 mb-2">
-                                    <span class="editable-field text-xs font-semibold text-slate-800 uppercase tracking-wide" contenteditable="true" onblur="updateText(${sIdx}, ${bIdx}, null, this.innerText, false, true)">${block.time}</span>
-                                    <button onclick="addTask(${sIdx}, ${bIdx})" class="px-2 py-0.5 rounded bg-white hover:bg-slate-100 text-slate-600 text-[11px] font-medium transition-colors border border-slate-200">
+                                <div class="flex items-center justify-between gap-2 border-b border-slate-200/60 dark:border-slate-800 pb-2 mb-2">
+                                    <span class="editable-field text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wide" contenteditable="true" onblur="updateText(${sIdx}, ${bIdx}, null, this.innerText, false, true)">${block.time}</span>
+                                    <button onclick="addTask(${sIdx}, ${bIdx})" class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-medium transition-colors border border-slate-200 dark:border-slate-700">
                                         + Drill
                                     </button>
                                 </div>
@@ -847,11 +986,50 @@
                     `;
                 });
 
+                // Build Homework Section HTML
+                const hw = session.homework || { completed: false, videos: "", drills: "", notes: "" };
+                const isHwDone = !!hw.completed;
+                const hwContainerClass = isHwDone 
+                    ? "mt-4 p-3.5 rounded-lg border bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 space-y-3 transition-colors"
+                    : "mt-4 p-3.5 rounded-lg border bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 space-y-3 transition-colors";
+
+                const homeworkHTML = `
+                    <div id="hw-container-${session.id}" class="${hwContainerClass}">
+                        <div class="flex items-center justify-between gap-2 border-b border-slate-200/60 dark:border-slate-800 pb-2">
+                            <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider uppercase">Homework & Self-Study Assignment</h4>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" ${isHwDone ? 'checked' : ''} onchange="toggleHomeworkComplete(${sIdx})" class="minimal-checkbox">
+                                <span class="text-xs font-semibold ${isHwDone ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-600 dark:text-slate-400'}">Homework complete</span>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <!-- Videos field -->
+                            <div class="space-y-1">
+                                <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">Videos to watch</span>
+                                <div class="editable-field text-xs text-slate-700 dark:text-slate-300 min-h-[40px] bg-white dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-800" contenteditable="true" onblur="updateHomeworkField(${sIdx}, 'videos', this.innerText)">${hw.videos || ""}</div>
+                            </div>
+
+                            <!-- Drills field -->
+                            <div class="space-y-1">
+                                <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">Drills to practise</span>
+                                <div class="editable-field text-xs text-slate-700 dark:text-slate-300 min-h-[40px] bg-white dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-800" contenteditable="true" onblur="updateHomeworkField(${sIdx}, 'drills', this.innerText)">${hw.drills || ""}</div>
+                            </div>
+
+                            <!-- Notes field -->
+                            <div class="space-y-1">
+                                <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">Notes & Key Takeaways</span>
+                                <div class="editable-field text-xs text-slate-700 dark:text-slate-300 min-h-[40px] bg-white dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-800" contenteditable="true" onblur="updateHomeworkField(${sIdx}, 'notes', this.innerText)">${hw.notes || ""}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
                 card.innerHTML = `
                     <!-- Session Card Header -->
-                    <div class="p-4 flex items-center justify-between gap-4 cursor-pointer select-none bg-white hover:bg-slate-50/50 transition-colors" onclick="toggleSessionCollapse(${session.id})">
+                    <div class="p-4 flex items-center justify-between gap-4 cursor-pointer select-none bg-white dark:bg-darkcard hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" onclick="toggleSessionCollapse(${session.id})">
                         <div class="flex items-center gap-3 min-w-0">
-                            <span id="expand-indicator-${session.id}" class="text-xs font-medium text-slate-400 hover:text-slate-600 px-1">
+                            <span id="expand-indicator-${session.id}" class="text-xs font-medium text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 px-1">
                                 ${isExpanded ? 'Collapse' : 'Expand'}
                             </span>
                             
@@ -860,22 +1038,25 @@
                                     <span class="px-2.5 py-0.5 rounded text-[11px] font-semibold border ${phaseBadgeClass}">${session.phase}</span>
                                     <div id="status-badge-${session.id}"></div>
                                 </div>
-                                <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
+                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">
                                     <span class="editable-field" contenteditable="true" onclick="event.stopPropagation()" onblur="updateText(${sIdx}, null, null, this.innerText, true)">${session.title}</span>
                                 </h3>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-2 flex-shrink-0" onclick="event.stopPropagation()">
-                            <button onclick="deleteSession(${sIdx})" class="text-xs text-slate-400 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 transition-colors">
+                            <button onclick="deleteSession(${sIdx})" class="text-xs text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-950 transition-colors">
                                 Delete
                             </button>
                         </div>
                     </div>
 
                     <!-- Session Content Body -->
-                    <div id="session-body-${session.id}" class="p-4 pt-0 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 ${isExpanded ? '' : 'hidden'}">
-                        ${blocksHTML}
+                    <div id="session-body-${session.id}" class="p-4 pt-0 border-t border-slate-100 dark:border-slate-800/80 ${isExpanded ? '' : 'hidden'}">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-3">
+                            ${blocksHTML}
+                        </div>
+                        ${homeworkHTML}
                     </div>
                 `;
 
