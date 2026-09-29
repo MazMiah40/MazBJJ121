@@ -28,6 +28,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -130,11 +133,11 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div class="flex items-center flex-wrap gap-2.5">
                     <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">No-Gi BJJ Fundamentals Tracker</h1>
-                    <!-- Real-time Cloud Sync Status Indicator -->
-                    <span id="sync-status" class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition-all">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500" id="sync-dot"></span>
-                        <span id="sync-text">Cloud Synced</span>
-                    </span>
+                    <!-- Real-time Cloud Sync Status Indicator (Clickable to set or view Firebase URL) -->
+                    <button id="sync-status" onclick="openCloudConfigModal()" class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-sky-400 transition-all cursor-pointer" title="Click to configure cross-device cloud sync">
+                        <span class="w-2 h-2 rounded-full bg-slate-400" id="sync-dot"></span>
+                        <span id="sync-text">Local Mode (Tap to Connect)</span>
+                    </button>
                 </div>
 
                 <!-- Global Action Controls & Dark Mode Toggle -->
@@ -263,6 +266,40 @@
         </div>
 
     </main>
+
+    <!-- Cloud Setup Modal for Cross-Device Synchronization -->
+    <div id="cloud-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white dark:bg-darkcard rounded-xl border border-slate-200 dark:border-darkborder w-full max-w-md p-6 m-4 card-shadow relative space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">Cross-Device Cloud Sync</h3>
+                <button onclick="closeCloudConfigModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold">
+                    ✕
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                <p>To sync edits in real-time between your laptop and mobile phone, connect a free Google Firebase Realtime Database.</p>
+                <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1.5 text-[11px]">
+                    <div class="font-semibold text-slate-800 dark:text-slate-200">Quick 60-Second Setup:</div>
+                    <ol class="list-decimal pl-4 space-y-1 text-slate-500 dark:text-slate-400">
+                        <li>Go to <a href="https://console.firebase.google.com" target="_blank" class="text-sky-600 dark:text-sky-400 underline font-medium">console.firebase.google.com</a> & create a free project.</li>
+                        <li>Click <strong>Build &rarr; Realtime Database &rarr; Create Database</strong>.</li>
+                        <li>Select <strong>Start in test mode</strong> and click Enable.</li>
+                        <li>Copy the database URL and paste it below.</li>
+                    </ol>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Firebase Realtime Database URL</label>
+                    <input type="text" id="firebase-url-input" placeholder="https://your-project-id-default-rtdb.firebaseio.com" class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-sky-500 transition-all font-mono">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button type="button" onclick="closeCloudConfigModal()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-xs font-medium transition-colors">Cancel</button>
+                <button type="button" onclick="saveCloudConfig()" class="px-4 py-1.5 rounded-lg bg-slate-900 dark:bg-sky-500 hover:bg-slate-800 dark:hover:bg-sky-400 text-white dark:text-slate-950 text-xs font-semibold transition-colors">Connect Database</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // FULL NO-GI CURRICULUM DATASET - DEFINED AT TOP TO AVOID REFERENCE ERRORS
@@ -455,7 +492,8 @@
         let expandedMap = {};
         let activeFilter = 'all';
         let searchQuery = '';
-        let syncChannel = null;
+        let firebaseDb = null;
+        let isReceivingRemoteUpdate = false;
 
         // UI Status Indicator
         function setSyncStatus(status, message) {
@@ -468,40 +506,117 @@
                 dot.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
                 text.innerText = message || "Syncing...";
                 if (statusEl) {
-                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition-all";
+                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition-all";
+                }
+            } else if (status === 'synced') {
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                text.innerText = message || "Cloud Live (Synced)";
+                if (statusEl) {
+                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition-all";
                 }
             } else {
-                dot.className = "w-2 h-2 rounded-full bg-emerald-500";
-                text.innerText = message || "Cloud Synced";
+                dot.className = "w-2 h-2 rounded-full bg-slate-400";
+                text.innerText = message || "Local Mode (Tap to Connect)";
                 if (statusEl) {
-                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition-all";
+                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-sky-400 transition-all cursor-pointer";
                 }
             }
         }
 
-        // Cross-tab and Cloud Sync Engine
-        function setupSynchronization() {
-            setSyncStatus('synced', 'Cloud Synced');
-
-            if ('BroadcastChannel' in window) {
-                try {
-                    syncChannel = new BroadcastChannel('bjj_curriculum_sync_v4');
-                    syncChannel.onmessage = (event) => {
-                        if (event.data && event.data.curriculum) {
-                            curriculum = event.data.curriculum;
-                            completedMap = event.data.completedMap || {};
-                            render();
-                        }
-                    };
-                } catch (e) {
-                    console.warn("BroadcastChannel relay unavailable:", e);
-                }
+        function openCloudConfigModal() {
+            const modal = document.getElementById('cloud-modal');
+            const input = document.getElementById('firebase-url-input');
+            const savedUrl = localStorage.getItem('bjj_firebase_url') || '';
+            if (input) input.value = savedUrl;
+            if (modal) {
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
             }
+        }
+
+        function closeCloudConfigModal() {
+            const modal = document.getElementById('cloud-modal');
+            if (modal) {
+                modal.classList.add('opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 200);
+            }
+        }
+
+        function saveCloudConfig() {
+            const input = document.getElementById('firebase-url-input');
+            const rawUrl = input ? input.value.trim().replace(/\/$/, "") : "";
+            if (rawUrl) {
+                localStorage.setItem('bjj_firebase_url', rawUrl);
+                initFirebaseSync(rawUrl);
+            } else {
+                localStorage.removeItem('bjj_firebase_url');
+                firebaseDb = null;
+                setSyncStatus('local');
+            }
+            closeCloudConfigModal();
+        }
+
+        function initFirebaseSync(dbUrl) {
+            if (!dbUrl || typeof firebase === 'undefined') {
+                setSyncStatus('local');
+                return;
+            }
+
+            try {
+                // Initialize Firebase App instance if not already initialized
+                if (!firebase.apps.length) {
+                    firebase.initializeApp({ databaseURL: dbUrl });
+                }
+                firebaseDb = firebase.database();
+                setSyncStatus('saving', 'Connecting...');
+
+                const curriculumRef = firebaseDb.ref('bjj_curriculum_tracker');
+
+                // Real-time listener: triggers whenever ANY device pushes updates
+                curriculumRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data && data.curriculum) {
+                        isReceivingRemoteUpdate = true;
+                        curriculum = data.curriculum;
+                        completedMap = data.completedMap || {};
+                        localStorage.setItem('bjj_nogi_curriculum_v4', JSON.stringify(curriculum));
+                        localStorage.setItem('bjj_nogi_progress_v4', JSON.stringify(completedMap));
+                        render();
+                        isReceivingRemoteUpdate = false;
+                        setSyncStatus('synced', 'Cloud Live (Synced)');
+                    } else {
+                        // First-time sync: upload current data to cloud
+                        pushToFirebase();
+                        setSyncStatus('synced', 'Cloud Live (Synced)');
+                    }
+                }, (error) => {
+                    console.warn("Firebase sync error:", error);
+                    setSyncStatus('local', 'Sync Error (Check Rules)');
+                });
+
+            } catch (err) {
+                console.error("Firebase setup exception:", err);
+                setSyncStatus('local', 'Local Mode (Invalid URL)');
+            }
+        }
+
+        function pushToFirebase() {
+            if (!firebaseDb || isReceivingRemoteUpdate) return;
+            setSyncStatus('saving', 'Syncing to Cloud...');
+
+            firebaseDb.ref('bjj_curriculum_tracker').set({
+                curriculum: curriculum,
+                completedMap: completedMap,
+                updatedAt: new Date().toISOString()
+            }).then(() => {
+                setSyncStatus('synced', 'Cloud Live (Synced)');
+            }).catch(err => {
+                console.warn("Cloud push error:", err);
+                setSyncStatus('local', 'Permission Denied');
+            });
         }
 
         function saveData() {
-            setSyncStatus('saving', 'Syncing...');
-            
             try {
                 localStorage.setItem('bjj_nogi_curriculum_v4', JSON.stringify(curriculum));
                 localStorage.setItem('bjj_nogi_progress_v4', JSON.stringify(completedMap));
@@ -510,20 +625,12 @@
                 console.warn("Local storage write error:", err);
             }
 
-            if (syncChannel) {
-                try {
-                    syncChannel.postMessage({
-                        curriculum: curriculum,
-                        completedMap: completedMap
-                    });
-                } catch (e) {
-                    console.warn("Sync relay broadcast notice:", e);
-                }
+            // Sync directly across the internet to phone/other screens
+            if (firebaseDb) {
+                pushToFirebase();
+            } else {
+                setSyncStatus('local');
             }
-
-            setTimeout(() => {
-                setSyncStatus('synced', 'Cloud Synced');
-            }, 300);
 
             updateProgressStats();
         }
@@ -889,7 +996,7 @@
                     `;
                 });
 
-                // Build Homework Section HTML (Empty and ready for entries)
+                // Build Homework Section HTML
                 const hw = session.homework || { completed: false, videos: "", drills: "", notes: "" };
                 const isHwDone = !!hw.completed;
                 const hwContainerClass = isHwDone 
@@ -929,26 +1036,26 @@
                 `;
 
                 card.innerHTML = `
-                    <!-- Session Card Header -->
-                    <div class="p-4 flex items-center justify-between gap-4 cursor-pointer select-none bg-white dark:bg-darkcard hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" onclick="toggleSessionCollapse(${session.id})">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <span id="expand-indicator-${session.id}" class="text-xs font-medium text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 px-1">
+                    <!-- Session Card Header (Optimized for Mobile Readability) -->
+                    <div class="p-3.5 sm:p-4 flex items-start sm:items-center justify-between gap-3 cursor-pointer select-none bg-white dark:bg-darkcard hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" onclick="toggleSessionCollapse(${session.id})">
+                        <div class="flex items-start sm:items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+                            <span id="expand-indicator-${session.id}" class="text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors mt-0.5 sm:mt-0 flex-shrink-0">
                                 ${isExpanded ? 'Collapse' : 'Expand'}
                             </span>
                             
-                            <div class="space-y-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="px-2.5 py-0.5 rounded text-[11px] font-semibold border ${phaseBadgeClass}">${session.phase}</span>
+                            <div class="space-y-1.5 flex-1 min-w-0">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold border ${phaseBadgeClass}">${session.phase}</span>
                                     <div id="status-badge-${session.id}"></div>
                                 </div>
-                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">
+                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight leading-snug break-words">
                                     <span class="editable-field" contenteditable="true" onclick="event.stopPropagation()" onblur="updateText(${sIdx}, null, null, this.innerText, true)">${session.title}</span>
                                 </h3>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2 flex-shrink-0" onclick="event.stopPropagation()">
-                            <button onclick="deleteSession(${sIdx})" class="text-xs text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-950 transition-colors">
+                        <div class="flex items-center gap-2 flex-shrink-0 ml-1" onclick="event.stopPropagation()">
+                            <button onclick="deleteSession(${sIdx})" class="text-xs text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-950 transition-colors" title="Delete Session">
                                 Delete
                             </button>
                         </div>
@@ -982,6 +1089,7 @@
             const savedData = localStorage.getItem('bjj_nogi_curriculum_v4');
             const savedProgress = localStorage.getItem('bjj_nogi_progress_v4');
             const savedExpanded = localStorage.getItem('bjj_nogi_expanded_v4');
+            const savedFirebaseUrl = localStorage.getItem('bjj_firebase_url');
 
             curriculum = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(DEFAULT_DATA));
             completedMap = savedProgress ? JSON.parse(savedProgress) : {};
@@ -991,7 +1099,12 @@
                 expandedMap[curriculum[0].id] = true;
             }
 
-            setupSynchronization();
+            if (savedFirebaseUrl) {
+                initFirebaseSync(savedFirebaseUrl);
+            } else {
+                setSyncStatus('local');
+            }
+
             render();
         });
     </script>
