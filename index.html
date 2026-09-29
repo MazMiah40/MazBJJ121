@@ -132,7 +132,7 @@
                         <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">No-Gi BJJ Fundamentals Tracker</h1>
                         <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">13-Week Private Curriculum</span>
                     </div>
-                    <!-- 1. PROGRAMME SUMMARY -->
+                    <!-- PROGRAMME SUMMARY -->
                     <p class="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed max-w-3xl">
                         <strong class="font-semibold text-slate-800 dark:text-slate-200">Programme Overview:</strong> A structured 13-week private coaching blueprint moving sequentially through Escapes, Guard Retention & Sweeps, Top Game Passing, and Submissions. Every 60-minute module integrates active hand-fighting warmups, technical breakdowns, spaced-repetition positional sparring, and dedicated homework logs.
                     </p>
@@ -140,14 +140,14 @@
 
                 <!-- Global Action Controls & Dark Mode Toggle -->
                 <div class="flex items-center flex-wrap gap-2">
-                    <!-- 2. DARK MODE ICON TOGGLE BUTTON -->
+                    <!-- DARK MODE SVG ICON TOGGLE BUTTON -->
                     <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors" title="Toggle Light / Dark Mode">
                         <!-- Sun Icon (shown in Dark Mode) -->
                         <svg id="sun-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
                         <!-- Moon Icon (shown in Light Mode) -->
-                        <svg id="moon-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg id="moon-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                         </svg>
                     </button>
@@ -306,7 +306,7 @@
     </div>
 
     <script>
-        // 3. FULL NO-GI CURRICULUM DATASET WITH HOMEWORK BLOCKS
+        // FULL NO-GI CURRICULUM DATASET WITH HOMEWORK BLOCKS
         const DEFAULT_DATA = [
             {
                 id: 1,
@@ -562,12 +562,14 @@
         let activeFilter = 'all';
         let searchQuery = '';
 
+        // ALWAYS DEFAULT TO LIGHT MODE
         function initTheme() {
             const savedTheme = localStorage.getItem('bjj_theme');
             const sunIcon = document.getElementById('sun-icon');
             const moonIcon = document.getElementById('moon-icon');
 
-            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            // Default to light unless user explicitly chose dark in a previous session
+            if (savedTheme === 'dark') {
                 document.documentElement.classList.add('dark');
                 sunIcon.classList.remove('hidden');
                 moonIcon.classList.add('hidden');
