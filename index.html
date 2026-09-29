@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BJJ 13-Week Private Curriculum Tracker</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --phase-1: #3b82f6;
+            --phase-2: #8b5cf6;
+            --phase-3: #f59e0b;
+            --phase-4: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 16px;
+            background: var(--card-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            background: var(--bg-color);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #000;
+            font-weight: 600;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .session-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .session-header {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .session-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .phase-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .phase-1 { background: rgba(59, 130, 246, 0.2); color: var(--phase-1); border: 1px solid var(--phase-1); }
+        .phase-2 { background: rgba(139, 92, 246, 0.2); color: var(--phase-2); border: 1px solid var(--phase-2); }
+        .phase-3 { background: rgba(245, 158, 11, 0.2); color: var(--phase-3); border: 1px solid var(--phase-3); }
+        .phase-4 { background: rgba(16, 185, 129, 0.2); color: var(--phase-4); border: 1px solid var(--phase-4); }
+
+        .session-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .session-body {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .time-block {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .time-header {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .task-item.completed span {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-item input[type="checkbox"] {
+            margin-top: 3px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .editable-text {
+            outline: none;
+            border-radius: 3px;
+            padding: 1px 4px;
+        }
+
+        .editable-text:focus {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid var(--border-color);
+            justify-content: flex-end;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div>
+                <h1>BJJ Fundamentals: 13-Week Private Curriculum</h1>
+                <div class="subtitle">1-on-1 Weekly Coaching Tracker (Oct – Dec)</div>
+            </div>
+            <div class="controls-row">
+                <button class="btn" onclick="addNewSession()">+ Add Session</button>
+                <button class="btn btn-secondary" onclick="resetToDefault()">Reset Defaults</button>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <span style="font-size: 0.85rem; font-weight: 600;" id="progress-text">0 / 0 Completed</span>
+            <div class="progress-container">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </header>
+
+    <main id="curriculum-container"></main>
+
+    <script>
+        const DEFAULT_DATA = [
+            {
+                id: 1,
+                title: "Session 1: Fixing Side Control Escapes & Frames",
+                phase: "Phase 1: Escapes",
+                phaseClass: "phase-1",
+                blocks: [
+                    { time: "00-10m | Warmup & Movement", tasks: ["Ukemi (break-falls)", "Side-to-side shrimping drills across mat"] },
+                    { time: "10-25m | Technical Alignment", tasks: ["Establishing forearm frames (crossface & hip)", "Stopping top player weight absorption"] },
+                    { time: "25-35m | Technical Escape", tasks: ["Frame -> Hip escape (Shrimp)", "Insert knee shield -> Recover Full/Half Guard"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Start in bottom Side Control", "Bottom: Recover guard / Top: Hold pin"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Troubleshooting frame collapses"] }
+                ]
+            },
+            {
+                id: 2,
+                title: "Session 2: Escaping Mount & Weight Reading",
+                phase: "Phase 1: Escapes",
+                phaseClass: "phase-1",
+                blocks: [
+                    { time: "00-10m | Warmup & Movement", tasks: ["Bridging (Upa) warmups", "Elbow-to-Knee sliding drills"] },
+                    { time: "10-25m | Upa Escape", tasks: ["Trapping arm + leg same side", "Explosive bridge at 45-degree angle"] },
+                    { time: "25-35m | Elbow-Knee Escape", tasks: ["Turning to hip & framing knee", "Sliding leg out to Half/Butterfly Guard"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Start in bottom Mount", "Bottom: Escape / Top: Hold or attack"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Reading weight distribution (Upa vs Elbow-Knee)"] }
+                ]
+            },
+            {
+                id: 3,
+                title: "Session 3: Back Survival & Escapes",
+                phase: "Phase 1: Escapes",
+                phaseClass: "phase-1",
+                blocks: [
+                    { time: "00-10m | Warmup & Movement", tasks: ["Hand-fighting drills", "Shoulder-dropping movement on mat"] },
+                    { time: "10-25m | Survival Posture", tasks: ["2-on-1 hand control on choking arm", "Identifying safe side vs danger side"] },
+                    { time: "25-35m | Escape Mechanics", tasks: ["Sliding hips down & clearing hooks", "Shoulders to mat, turn into top guard"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Start back control with seatbelt locked", "Bottom: Escape / Top: Secure RNC"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Neck protection tactics review"] }
+                ]
+            },
+            {
+                id: 4,
+                title: "Session 4: Bottom Half Guard System",
+                phase: "Phase 1: Escapes",
+                phaseClass: "phase-1",
+                blocks: [
+                    { time: "00-10m | Warmup & Movement", tasks: ["Hip-heist drills", "Underhook pummeling from knees"] },
+                    { time: "10-25m | Preventing Flat Back", tasks: ["Staying on hip & using knee shield", "Framing collar/crossface"] },
+                    { time: "25-35m | Underhook Entry", tasks: ["Shooting underhook on weight shift", "Build to knees / sweep or full guard"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Start in Bottom Half Guard", "Bottom: Underhook to sweep / Top: Flatten & pass"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Head position adjustments to avoid crossface"] }
+                ]
+            },
+            {
+                id: 5,
+                title: "Session 5: Butterfly Guard & Guard Pulls",
+                phase: "Phase 2: Guards",
+                phaseClass: "phase-2",
+                blocks: [
+                    { time: "00-10m | Stand-up Entry", tasks: ["Collar & sleeve grips", "Pulling straight to Butterfly Guard"] },
+                    { time: "10-25m | Butterfly Mechanics", tasks: ["Hook placement & seatbelt/underhook grips", "Keeping posture loaded on shins"] },
+                    { time: "25-35m | Elevator Sweep", tasks: ["Forward kuzushi off-balance", "Elevator hook to load hips and sweep"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Start standing or Butterfly", "Bottom: Sweep/retain / Top: Flatten & pass"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Distance management when top stands"] }
+                ]
+            },
+            {
+                id: 6,
+                title: "Session 6: Guard Chain (Butterfly <-> Half <-> Closed)",
+                phase: "Phase 2: Guards",
+                phaseClass: "phase-2",
+                blocks: [
+                    { time: "00-10m | Warmup & Movement", tasks: ["Leg pummeling drills", "Guard recovery movement patterns"] },
+                    { time: "10-25m | Pressure Transitions", tasks: ["Transitioning Butterfly -> Half/Closed under heavy pressure"] },
+                    { time: "25-35m | Re-guarding", tasks: ["Feet-on-hips distance creation", "Re-establishing Closed Guard"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Pass vs Guard retention using Butterfly, Half, Closed"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Energy efficiency during guard recovery"] }
+                ]
+            },
+            {
+                id: 7,
+                title: "Session 7: Closed Guard Sweeps & Snapdowns",
+                phase: "Phase 2: Guards",
+                phaseClass: "phase-2",
+                blocks: [
+                    { time: "00-10m | Stand-up Entry", tasks: ["Snapdown drill to force hands to mat/turtle"] },
+                    { time: "10-25m | Scissor Sweep", tasks: ["Collar/sleeve control & scissor motion", "Off-balancing and sweep execution"] },
+                    { time: "25-35m | Hip Bump Sweep", tasks: ["Sit up & trap arm when top postures", "Drive hips through to complete sweep"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Closed guard live rounds", "Bottom: Scissor/Hip Bump / Top: Break guard"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Grip swaps during sweeps"] }
+                ]
+            },
+            {
+                id: 8,
+                title: "Session 8: Guard Attacks (Sweep or Sub)",
+                phase: "Phase 2: Guards",
+                phaseClass: "phase-2",
+                blocks: [
+                    { time: "00-10m | Warmup & Movement", tasks: ["Hip-mobility drills", "Arm isolation reps"] },
+                    { time: "10-25m | Dilemma Chain", tasks: ["Hip bump attempt -> Opponent posts arm", "Transitioning to Guillotine or Kimura lock"] },
+                    { time: "25-35m | Finishing Mechanics", tasks: ["Guillotine & Kimura mechanics without losing guard"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Closed Guard attack chains", "Bottom: Sweep or Sub / Top: Pass safely"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Adjusting choke angles & wrist control"] }
+                ]
+            },
+            {
+                id: 9,
+                title: "Session 9: Single-Leg Takedown & Open Guard Pass",
+                phase: "Phase 3: Top Game",
+                phaseClass: "phase-3",
+                blocks: [
+                    { time: "00-10m | Stand-up Setup", tasks: ["Level change & head-inside Single-Leg step", "Running the pipe finish"] },
+                    { time: "10-25m | Landing Position", tasks: ["Establishing ankle/pant control immediately on landing"] },
+                    { time: "25-35m | Torreando Pass", tasks: ["Steering legs side-to-side", "Stepping past hip line to Side Control"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Start standing or Open Guard", "Top: Takedown/Pass / Bottom: Sweep/Pull"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Balance & weight distribution while passing"] }
+                ]
+            },
+            {
+                id: 10,
+                title: "Session 10: Half Guard Passing (Knee Cut) & Sprawl",
+                phase: "Phase 3: Top Game",
+                phaseClass: "phase-3",
+                blocks: [
+                    { time: "00-10m | Stand-up Sprawl", tasks: ["Heavy hips sprawl defense vs shot", "Spinning to front headlock"] },
+                    { time: "10-25m | Knee Cut Mechanics", tasks: ["Crossface & underhook in Half Guard", "Driving knee diagonally across thigh"] },
+                    { time: "25-35m | Clearing Foot", tasks: ["Freeing trailing ankle from Half Guard to Side Control"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Top in Half Guard", "Top: Knee Cut pass / Bottom: Underhook or sweep"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Underhook retention during pass"] }
+                ]
+            },
+            {
+                id: 11,
+                title: "Session 11: Heavy Top Control (Side to Mount)",
+                phase: "Phase 3: Top Game",
+                phaseClass: "phase-3",
+                blocks: [
+                    { time: "00-10m | Top Mobility", tasks: ["Switching sides & knee-on-belly transitions"] },
+                    { time: "10-25m | Cooking Bottom Player", tasks: ["Crossface shoulder pressure", "Hip-to-hip alignment eliminating space"] },
+                    { time: "25-35m | Mount Transition", tasks: ["Sliding knee across belly to Mount", "Avoiding Half Guard trap"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Top in Side Control", "Top: Hold 90s or Mount / Bottom: Escape"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Weight distribution for maximum pressure"] }
+                ]
+            },
+            {
+                id: 12,
+                title: "Session 12: High-Percentage Top Submissions",
+                phase: "Phase 4: Finishes",
+                phaseClass: "phase-4",
+                blocks: [
+                    { time: "00-10m | Arm Isolation", tasks: ["Figure-four grip mechanics"] },
+                    { time: "10-25m | Americana & Kimura", tasks: ["Isolating arm from Side/Mount", "Rotating shoulder joint safely"] },
+                    { time: "25-35m | Taking Back from Mount", tasks: ["Opponent turns -> Slide seatbelt & insert hooks", "Securing Rear-Naked Choke"] },
+                    { time: "35-50m | Positional Sparring", tasks: ["Top position start", "Top: Submit without losing position / Bottom: Escape"] },
+                    { time: "50-60m | Q&A / Review", tasks: ["Submission control before applying force"] }
+                ]
+            },
+            {
+                id: 13,
+                title: "Session 13: Live Flow & Full System Review",
+                phase: "Phase 4: Finishes",
+                phaseClass: "phase-4",
+                blocks: [
+                    { time: "00-10m | Warmup", tasks: ["Full mobility & ukemi warmup"] },
+                    { time: "10-25m | Linking the Chain", tasks: ["Takedown/Pull -> Guard -> Sweep -> Pass -> Control -> Sub"] },
+                    { time: "25-45m | Live Positional Rounds", tasks: ["3-minute rounds with real-time coaching feedback"] },
+                    { time: "45-60m | Final Assessment", tasks: ["Identifying weak points for future development"] }
+                ]
+            }
+        ];
+
+        let curriculum = [];
+        let completedMap = {};
+
+        function init() {
+            const savedData = localStorage.getItem('bjj_curriculum_data');
+            const savedProgress = localStorage.getItem('bjj_curriculum_progress');
+
+            curriculum = savedData ? JSON.parse(savedData) : DEFAULT_DATA;
+            completedMap = savedProgress ? JSON.parse(savedProgress) : {};
+
+            render();
+        }
+
+        function saveData() {
+            localStorage.setItem('bjj_curriculum_data', JSON.stringify(curriculum));
+            localStorage.setItem('bjj_curriculum_progress', JSON.stringify(completedMap));
+            updateProgress();
+        }
+
+        function resetToDefault() {
+            if (confirm("Reset curriculum to original 13-week defaults? Your custom edits will be cleared.")) {
+                curriculum = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                completedMap = {};
+                saveData();
+                render();
+            }
+        }
+
+        function toggleTask(key) {
+            completedMap[key] = !completedMap[key];
+            saveData();
+            const el = document.getElementById(`task-item-${key}`);
+            if (el) {
+                if (completedMap[key]) el.classList.add('completed');
+                else el.classList.remove('completed');
+            }
+        }
+
+        function updateProgress() {
+            let total = 0;
+            let checked = 0;
+
+            curriculum.forEach((session) => {
+                session.blocks.forEach((block, bIdx) => {
+                    block.tasks.forEach((_, tIdx) => {
+                        total++;
+                        const key = `${session.id}-${bIdx}-${tIdx}`;
+                        if (completedMap[key]) checked++;
+                    });
+                });
+            });
+
+            const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
+            document.getElementById('progress-text').innerText = `${checked} / ${total} Tasks Done (${pct}%)`;
+            document.getElementById('progress-fill').style.width = `${pct}%`;
+        }
+
+        function updateText(sessionIdx, blockIdx, taskIdx, newText, isTitle = false, isBlockHeader = false) {
+            if (isTitle) {
+                curriculum[sessionIdx].title = newText;
+            } else if (isBlockHeader) {
+                curriculum[sessionIdx].blocks[blockIdx].time = newText;
+            } else {
+                curriculum[sessionIdx].blocks[blockIdx].tasks[taskIdx] = newText;
+            }
+            saveData();
+        }
+
+        function addTask(sessionIdx, blockIdx) {
+            curriculum[sessionIdx].blocks[blockIdx].tasks.push("New drill / note");
+            saveData();
+            render();
+        }
+
+        function deleteTask(sessionIdx, blockIdx, taskIdx) {
+            curriculum[sessionIdx].blocks[blockIdx].tasks.splice(taskIdx, 1);
+            saveData();
+            render();
+        }
+
+        function deleteSession(sessionIdx) {
+            if (confirm("Delete this session completely?")) {
+                curriculum.splice(sessionIdx, 1);
+                saveData();
+                render();
+            }
+        }
+
+        function addNewSession() {
+            const newId = Date.now();
+            curriculum.push({
+                id: newId,
+                title: `Session ${curriculum.length + 1}: Custom Focus`,
+                phase: "Custom Phase",
+                phaseClass: "phase-1",
+                blocks: [
+                    { time: "00-15m | Warmup & Intro", tasks: ["Movement drill"] },
+                    { time: "15-45m | Technique & Drilling", tasks: ["Core movement"] },
+                    { time: "45-60m | Live Sparring & Review", tasks: ["Positional rounds"] }
+                ]
+            });
+            saveData();
+            render();
+        }
+
+        function render() {
+            const container = document.getElementById('curriculum-container');
+            container.innerHTML = '';
+
+            curriculum.forEach((session, sIdx) => {
+                const card = document.createElement('div');
+                card.className = 'session-card';
+
+                let blocksHTML = '';
+                session.blocks.forEach((block, bIdx) => {
+                    let tasksHTML = '';
+                    block.tasks.forEach((task, tIdx) => {
+                        const key = `${session.id}-${bIdx}-${tIdx}`;
+                        const isChecked = !!completedMap[key];
+                        tasksHTML += `
+                            <li class="task-item ${isChecked ? 'completed' : ''}" id="task-item-${key}">
+                                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleTask('${key}')">
+                                <span class="editable-text" contenteditable="true" onblur="updateText(${sIdx}, ${bIdx}, ${tIdx}, this.innerText)">${task}</span>
+                                <button class="btn btn-danger btn-small" style="margin-left:auto; padding:0 4px;" onclick="deleteTask(${sIdx}, ${bIdx}, ${tIdx})">×</button>
+                            </li>
+                        `;
+                    });
+
+                    blocksHTML += `
+                        <div class="time-block">
+                            <div class="time-header">
+                                <span class="editable-text" contenteditable="true" onblur="updateText(${sIdx}, ${bIdx}, null, this.innerText, false, true)">${block.time}</span>
+                                <button class="btn btn-secondary btn-small" onclick="addTask(${sIdx}, ${bIdx})">+ Task</button>
+                            </div>
+                            <ul class="task-list">${tasksHTML}</ul>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="session-header">
+                        <div class="session-header-left">
+                            <span class="phase-badge ${session.phaseClass}">${session.phase}</span>
+                            <span class="session-title editable-text" contenteditable="true" onblur="updateText(${sIdx}, null, null, this.innerText, true)">${session.title}</span>
+                        </div>
+                        <button class="btn btn-danger btn-small" onclick="deleteSession(${sIdx})">Delete Session</button>
+                    </div>
+                    <div class="session-body">${blocksHTML}</div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            updateProgress();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
