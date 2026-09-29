@@ -488,13 +488,544 @@
             }
         ];
 
+        let curriculum = [];
+        let completedMap = {};
+        let expandedMap = {};
+        let activeFilter = 'all';
+        let searchQuery = '';
+        let firebaseDb = null;
+        let isReceivingRemoteUpdate = false;
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('bjj_theme');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                sunIcon?.classList.remove('hidden');
+                moonIcon?.classList.add('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                sunIcon?.classList.add('hidden');
+                moonIcon?.classList.remove('hidden');
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('bjj_theme', isDark ? 'dark' : 'light');
+            
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            
+            if (isDark) {
+                sunIcon?.classList.remove('hidden');
+                moonIcon?.classList.add('hidden');
+            } else {
+                sunIcon?.classList.add('hidden');
+                moonIcon?.classList.remove('hidden');
+            }
+        }
+
+        function setSyncStatus(status, message) {
+            const statusEl = document.getElementById('sync-status');
+            const dot = document.getElementById('sync-dot');
+            const text = document.getElementById('sync-text');
+            if (!dot || !text) return;
+
+            if (status === 'saving') {
+                dot.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+                text.innerText = message || "Syncing...";
+                if (statusEl) {
+                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition-all";
+                }
+            } else if (status === 'synced') {
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                text.innerText = message || "Cloud Live (Synced)";
+                if (statusEl) {
+                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition-all";
+                }
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-slate-400";
+                text.innerText = message || "Local Mode (Tap to Connect)";
+                if (statusEl) {
+                    statusEl.className = "inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-sky-400 transition-all cursor-pointer";
+                }
+            }
+        }
+
+        function openCloudConfigModal() {
+            const modal = document.getElementById('cloud-modal');
+            const input = document.getElementById('firebase-url-input');
+            const savedUrl = localStorage.getItem('bjj_firebase_url') || '';
+            if (input) input.value = savedUrl;
+            if (modal) {
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            }
+        }
+
+        function closeCloudConfigModal() {
+            const modal = document.getElementById('cloud-modal');
+            if (modal) {
+                modal.classList.add('opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 200);
+            }
+        }
+
+        function saveCloudConfig() {
+            const input = document.getElementById('firebase-url-input');
+            const rawUrl = input ? input.value.trim().replace(/\/$/, "") : "";
+            if (rawUrl) {
+                localStorage.setItem('bjj_firebase_url', rawUrl);
+                initFirebaseSync(rawUrl);
+            } else {
+                localStorage.removeItem('bjj_firebase_url');
+                firebaseDb = null;
+                setSyncStatus('local');
+            }
+            closeCloudConfigModal();
+        }
+
+        function initFirebaseSync(dbUrl) {
+            if (!dbUrl || typeof firebase === 'undefined') {
+                setSyncStatus('local');
+                return;
+            }
+
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp({ databaseURL: dbUrl });
+                }
+                firebaseDb = firebase.database();
+                setSyncStatus('saving', 'Connecting...');
+
+                const curriculumRef = firebaseDb.ref('bjj_curriculum_tracker');
+
+                curriculumRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data && data.curriculum) {
+                        isReceivingRemoteUpdate = true;
+                        curriculum = data.curriculum;
+                        completedMap = data.completedMap || {};
+                        localStorage.setItem('bjj_nogi_curriculum_v7', JSON.stringify(curriculum));
+                        localStorage.setItem('bjj_nogi_progress_v7', JSON.stringify(completedMap));
+                        render();
+                        isReceivingRemoteUpdate = false;
+                        setSyncStatus('synced', 'Cloud Live (Synced)');
+                    } else {
+                        pushToFirebase();
+                        setSyncStatus('synced', 'Cloud Live (Synced)');
+                    }
+                }, (error) => {
+                    console.warn("Firebase sync error:", error);
+                    setSyncStatus('local', 'Sync Error (Check Rules)');
+                });
+
+            } catch (err) {
+                console.error("Firebase setup exception:", err);
+                setSyncStatus('local', 'Local Mode (Invalid URL)');
+            }
+        }
+
+        function pushToFirebase() {
+            if (!firebaseDb || isReceivingRemoteUpdate) return;
+            setSyncStatus('saving', 'Syncing to Cloud...');
+
+            firebaseDb.ref('bjj_curriculum_tracker').set({
+                curriculum: curriculum,
+                completedMap: completedMap,
+                updatedAt: new Date().toISOString()
+            }).then(() => {
+                setSyncStatus('synced', 'Cloud Live (Synced)');
+            }).catch(err => {
+                console.warn("Cloud push error:", err);
+                setSyncStatus('local', 'Permission Denied');
+            });
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('bjj_nogi_curriculum_v7', JSON.stringify(curriculum));
+                localStorage.setItem('bjj_nogi_progress_v7', JSON.stringify(completedMap));
+                localStorage.setItem('bjj_nogi_expanded_v7', JSON.stringify(expandedMap));
+            } catch (err) {
+                console.warn("Local storage write error:", err);
+            }
+
+            if (firebaseDb) {
+                pushToFirebase();
+            } else {
+                setSyncStatus('local');
+            }
+
+            updateProgressStats();
+        }
+
+        function toggleTask(key) {
+            completedMap[key] = !completedMap[key];
+            saveData();
+            
+            const textEl = document.getElementById(`task-text-${key}`);
+            if (textEl) {
+                if (completedMap[key]) {
+                    textEl.classList.add('line-through', 'text-slate-400', 'dark:text-slate-500');
+                    textEl.classList.remove('text-slate-700', 'dark:text-slate-200');
+                } else {
+                    textEl.classList.remove('line-through', 'text-slate-400', 'dark:text-slate-500');
+                    textEl.classList.add('text-slate-700', 'dark:text-slate-200');
+                }
+            }
+            updateSessionStatusBadges();
+        }
+
+        function toggleHomeworkComplete(sessionIdx) {
+            if (!curriculum[sessionIdx].homework) {
+                curriculum[sessionIdx].homework = { completed: false, videos: "", drills: "", notes: "" };
+            }
+            curriculum[sessionIdx].homework.completed = !curriculum[sessionIdx].homework.completed;
+            saveData();
+            
+            const containerEl = document.getElementById(`hw-container-${curriculum[sessionIdx].id}`);
+            if (containerEl) {
+                if (curriculum[sessionIdx].homework.completed) {
+                    containerEl.className = "mt-4 p-3.5 rounded-lg border bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 space-y-3 transition-colors";
+                } else {
+                    containerEl.className = "mt-4 p-3.5 rounded-lg border bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 space-y-3 transition-colors";
+                }
+            }
+        }
+
+        function updateHomeworkField(sessionIdx, field, newText) {
+            if (!curriculum[sessionIdx].homework) {
+                curriculum[sessionIdx].homework = { completed: false, videos: "", drills: "", notes: "" };
+            }
+            curriculum[sessionIdx].homework[field] = newText;
+            saveData();
+        }
+
+        function toggleSessionCollapse(sessionId) {
+            expandedMap[sessionId] = !expandedMap[sessionId];
+            saveData();
+            
+            const bodyEl = document.getElementById(`session-body-${sessionId}`);
+            const indicatorEl = document.getElementById(`expand-indicator-${sessionId}`);
+            
+            if (bodyEl && indicatorEl) {
+                if (expandedMap[sessionId]) {
+                    bodyEl.classList.remove('hidden');
+                    indicatorEl.innerText = "Collapse";
+                } else {
+                    bodyEl.classList.add('hidden');
+                    indicatorEl.innerText = "Expand";
+                }
+            }
+        }
+
+        function toggleAllSessions(expand) {
+            curriculum.forEach(s => expandedMap[s.id] = expand);
+            saveData();
+            render();
+        }
+
+        function setFilter(phase) {
+            activeFilter = phase;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white', 'dark:bg-sky-500', 'dark:text-slate-950');
+                btn.classList.add('text-slate-600', 'dark:text-slate-400');
+            });
+
+            const activeBtn = document.getElementById(`filter-${phase}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-slate-900', 'text-white', 'dark:bg-sky-500', 'dark:text-slate-950');
+                activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
+            }
+            render();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            render();
+        }
+
+        function updateProgressStats() {
+            let totalTasks = 0;
+            let completedTasks = 0;
+            let completedSessions = 0;
+
+            curriculum.forEach((session) => {
+                let sessionTotal = 0;
+                let sessionChecked = 0;
+
+                session.blocks.forEach((block, bIdx) => {
+                    block.tasks.forEach((_, tIdx) => {
+                        totalTasks++;
+                        sessionTotal++;
+                        const key = `${session.id}-${bIdx}-${tIdx}`;
+                        if (completedMap[key]) {
+                            completedTasks++;
+                            sessionChecked++;
+                        }
+                    });
+                });
+
+                if (sessionTotal > 0 && sessionTotal === sessionChecked) {
+                    completedSessions++;
+                }
+            });
+
+            const pct = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+            
+            const statPct = document.getElementById('stat-percentage');
+            const statTasks = document.getElementById('stat-tasks');
+            const statSessions = document.getElementById('stat-sessions');
+            const statTotal = document.getElementById('stat-sessions-total');
+            const fill = document.getElementById('progress-fill');
+            const statusEl = document.getElementById('stat-status-text');
+
+            if (statPct) statPct.innerText = `${pct}%`;
+            if (statTasks) statTasks.innerText = `${completedTasks} / ${totalTasks} Drills Completed`;
+            if (statSessions) statSessions.innerText = `${completedSessions}`;
+            if (statTotal) statTotal.innerText = `/ ${curriculum.length} Sessions`;
+            if (fill) fill.style.width = `${pct}%`;
+
+            if (statusEl) {
+                if (pct === 100) statusEl.innerText = "Curriculum Mastered";
+                else if (pct >= 75) statusEl.innerText = "Advanced Stage";
+                else if (pct >= 50) statusEl.innerText = "Midway Completed";
+                else if (pct > 0) statusEl.innerText = "Training in Progress";
+                else statusEl.innerText = "Ready to begin";
+            }
+        }
+
+        function updateSessionStatusBadges() {
+            curriculum.forEach(session => {
+                let total = 0;
+                let checked = 0;
+                session.blocks.forEach((block, bIdx) => {
+                    block.tasks.forEach((_, tIdx) => {
+                        total++;
+                        if (completedMap[`${session.id}-${bIdx}-${tIdx}`]) checked++;
+                    });
+                });
+
+                const badgeEl = document.getElementById(`status-badge-${session.id}`);
+                if (badgeEl) {
+                    if (total > 0 && checked === total) {
+                        badgeEl.className = "px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800";
+                        badgeEl.innerText = "Completed";
+                    } else if (checked > 0) {
+                        badgeEl.className = "px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800";
+                        badgeEl.innerText = `${checked}/${total} Tasks`;
+                    } else {
+                        badgeEl.className = "px-2 py-0.5 rounded text-[11px] font-medium bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700";
+                        badgeEl.innerText = "Pending";
+                    }
+                }
+            });
+        }
+
+        function updateText(sessionIdx, blockIdx, taskIdx, newText, isTitle = false, isBlockHeader = false) {
+            if (!newText.trim()) return;
+            if (isTitle) {
+                curriculum[sessionIdx].title = newText;
+            } else if (isBlockHeader) {
+                curriculum[sessionIdx].blocks[blockIdx].time = newText;
+            } else {
+                curriculum[sessionIdx].blocks[blockIdx].tasks[taskIdx] = newText;
+            }
+            saveData();
+        }
+
+        function addTask(sessionIdx, blockIdx) {
+            curriculum[sessionIdx].blocks[blockIdx].tasks.push("New technical drill");
+            expandedMap[curriculum[sessionIdx].id] = true;
+            saveData();
+            render();
+        }
+
+        function deleteTask(sessionIdx, blockIdx, taskIdx) {
+            curriculum[sessionIdx].blocks[blockIdx].tasks.splice(taskIdx, 1);
+            saveData();
+            render();
+        }
+
+        function deleteSession(sessionIdx) {
+            curriculum.splice(sessionIdx, 1);
+            saveData();
+            render();
+        }
+
+        function getPhaseBadgeStyle(phaseClass) {
+            switch(phaseClass) {
+                case 'phase-1': 
+                    return 'bg-red-50 text-red-800 dark:bg-red-950/60 dark:text-red-300 border-red-200 dark:border-red-900/60';
+                case 'phase-2': 
+                    return 'bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-900/60';
+                case 'phase-3': 
+                    return 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/60';
+                case 'phase-4': 
+                    return 'bg-purple-50 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-900/60';
+                default: 
+                    return 'bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
+            }
+        }
+
+        function render() {
+            const container = document.getElementById('curriculum-container');
+            const emptyState = document.getElementById('empty-state');
+            if (!container) return;
+
+            container.innerHTML = '';
+            let visibleCount = 0;
+
+            curriculum.forEach((session, sIdx) => {
+                if (activeFilter !== 'all' && !session.phase.includes(activeFilter)) {
+                    return;
+                }
+
+                if (searchQuery) {
+                    const titleMatch = session.title.toLowerCase().includes(searchQuery);
+                    const taskMatch = session.blocks.some(b => 
+                        b.time.toLowerCase().includes(searchQuery) || 
+                        b.tasks.some(t => t.toLowerCase().includes(searchQuery))
+                    );
+                    const hwMatch = session.homework && (
+                        (session.homework.videos && session.homework.videos.toLowerCase().includes(searchQuery)) ||
+                        (session.homework.drills && session.homework.drills.toLowerCase().includes(searchQuery)) ||
+                        (session.homework.notes && session.homework.notes.toLowerCase().includes(searchQuery))
+                    );
+                    if (!titleMatch && !taskMatch && !hwMatch) return;
+                }
+
+                visibleCount++;
+                const isExpanded = !!expandedMap[session.id];
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-darkcard rounded-xl border border-slate-200 dark:border-darkborder card-shadow transition-colors overflow-hidden';
+
+                const phaseBadgeClass = getPhaseBadgeStyle(session.phaseClass);
+
+                let blocksHTML = '';
+                session.blocks.forEach((block, bIdx) => {
+                    let tasksHTML = '';
+                    block.tasks.forEach((task, tIdx) => {
+                        const key = `${session.id}-${bIdx}-${tIdx}`;
+                        const isChecked = !!completedMap[key];
+                        tasksHTML += `
+                            <li class="flex items-start justify-between gap-2 group/task py-1.5 px-2 rounded hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" id="task-item-${key}">
+                                <div class="flex items-start gap-2.5 flex-grow min-w-0">
+                                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleTask('${key}')" class="minimal-checkbox mt-0.5">
+                                    <span id="task-text-${key}" class="editable-field text-xs ${isChecked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'}" contenteditable="true" onblur="updateText(${sIdx}, ${bIdx}, ${tIdx}, this.innerText)">${task}</span>
+                                </div>
+                                <button onclick="deleteTask(${sIdx}, ${bIdx}, ${tIdx})" class="opacity-0 group-hover/task:opacity-100 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 text-xs px-1 transition-opacity" title="Remove drill">
+                                    ✕
+                                </button>
+                            </li>
+                        `;
+                    });
+
+                    blocksHTML += `
+                        <div class="bg-slate-50/50 dark:bg-slate-900/40 rounded-lg p-3.5 border border-slate-100 dark:border-slate-800/80 flex flex-col justify-between space-y-2">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 border-b border-slate-200/60 dark:border-slate-800 pb-2 mb-2">
+                                    <span class="editable-field text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wide" contenteditable="true" onblur="updateText(${sIdx}, ${bIdx}, null, this.innerText, false, true)">${block.time}</span>
+                                    <button onclick="addTask(${sIdx}, ${bIdx})" class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-medium transition-colors border border-slate-200 dark:border-slate-700">
+                                        + Drill
+                                    </button>
+                                </div>
+                                <ul class="space-y-0.5">${tasksHTML}</ul>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const hw = session.homework || { completed: false, videos: "", drills: "", notes: "" };
+                const isHwDone = !!hw.completed;
+                const hwContainerClass = isHwDone 
+                    ? "mt-4 p-3.5 rounded-lg border bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 space-y-3 transition-colors"
+                    : "mt-4 p-3.5 rounded-lg border bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 space-y-3 transition-colors";
+
+                const homeworkHTML = `
+                    <div id="hw-container-${session.id}" class="${hwContainerClass}">
+                        <div class="flex items-center justify-between gap-2 border-b border-slate-200/60 dark:border-slate-800 pb-2">
+                            <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider uppercase">Homework & Self-Study Assignment</h4>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" ${isHwDone ? 'checked' : ''} onchange="toggleHomeworkComplete(${sIdx})" class="minimal-checkbox">
+                                <span class="text-xs font-semibold ${isHwDone ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-600 dark:text-slate-400'}">Homework complete</span>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">Videos to watch</span>
+                                <div class="editable-field text-xs text-slate-700 dark:text-slate-300 min-h-[40px] bg-white dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-800" contenteditable="true" onblur="updateHomeworkField(${sIdx}, 'videos', this.innerText)">${hw.videos || ""}</div>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">Drills to practise</span>
+                                <div class="editable-field text-xs text-slate-700 dark:text-slate-300 min-h-[40px] bg-white dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-800" contenteditable="true" onblur="updateHomeworkField(${sIdx}, 'drills', this.innerText)">${hw.drills || ""}</div>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">Notes & Key Takeaways</span>
+                                <div class="editable-field text-xs text-slate-700 dark:text-slate-300 min-h-[40px] bg-white dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-800" contenteditable="true" onblur="updateHomeworkField(${sIdx}, 'notes', this.innerText)">${hw.notes || ""}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                card.innerHTML = `
+                    <div class="p-3.5 sm:p-4 flex items-start sm:items-center justify-between gap-3 cursor-pointer select-none bg-white dark:bg-darkcard hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors" onclick="toggleSessionCollapse(${session.id})">
+                        <div class="flex items-start sm:items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+                            <span id="expand-indicator-${session.id}" class="text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors mt-0.5 sm:mt-0 flex-shrink-0">
+                                ${isExpanded ? 'Collapse' : 'Expand'}
+                            </span>
+                            
+                            <div class="space-y-1.5 flex-1 min-w-0">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold border ${phaseBadgeClass}">${session.phase}</span>
+                                    <div id="status-badge-${session.id}"></div>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight leading-snug break-words">
+                                    <span class="editable-field" contenteditable="true" onclick="event.stopPropagation()" onblur="updateText(${sIdx}, null, null, this.innerText, true)">${session.title}</span>
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 flex-shrink-0 ml-1" onclick="event.stopPropagation()">
+                            <button onclick="deleteSession(${sIdx})" class="text-xs text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-950 transition-colors" title="Delete Session">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="session-body-${session.id}" class="p-4 pt-0 border-t border-slate-100 dark:border-slate-800/80 ${isExpanded ? '' : 'hidden'}">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-3">
+                            ${blocksHTML}
+                        </div>
+                        ${homeworkHTML}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            if (visibleCount === 0) {
+                emptyState?.classList.remove('hidden');
+            } else {
+                emptyState?.classList.add('hidden');
+            }
+
+            updateProgressStats();
+            updateSessionStatusBadges();
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
 
             // Updated version key to ensure new "Week Y - Session Z" titles load cleanly
-            const savedData = localStorage.getItem('bjj_nogi_curriculum_v6');
-            const savedProgress = localStorage.getItem('bjj_nogi_progress_v6');
-            const savedExpanded = localStorage.getItem('bjj_nogi_expanded_v6');
+            const savedData = localStorage.getItem('bjj_nogi_curriculum_v7');
+            const savedProgress = localStorage.getItem('bjj_nogi_progress_v7');
+            const savedExpanded = localStorage.getItem('bjj_nogi_expanded_v7');
             const savedFirebaseUrl = localStorage.getItem('bjj_firebase_url');
 
             curriculum = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(DEFAULT_DATA));
